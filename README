@@ -1,5 +1,5 @@
-[Note: on branch: `game`, this branch is only intended for the game itself. Unittest & Pytest tests will each
-have their separate branches.]
+[Note: this branch is only intended for the game itself. Unittest & Pytest tests will each have their separate
+branches.]
 
 ===========================================
 THOUGHT MACHINE
