@@ -5,36 +5,49 @@ auction_records = {}
 closing_records = {}
 
 
-def calculate_winning_stats():
-
-    stats = []
-
-    if len(item_record['bids']) == 1:
-        winner =
+def print_stats(ending_stats: list):
+    result = '|'.join([f'{info:.2f}' if isinstance(info, float) else str(info) for info in ending_stats])
+    print(result)
 
 
+def calculate_winning_stats(item_information: dict):
 
+    stats = {}
 
-    return
+    if len(item_information['bids']) == 1:
+        stats['winner'] = list(item_information['bids'].keys())[0]
+        stats['sold_status'] = "SOLD"
+        stats['price_to_pay'] = item_information['reserve_price']
+        stats['total_bids'] = len(item_information['bids'][stats['winner']])
+        stats['highest_bid'] = item_information['bids'][stats['winner']][-1][1]
+        stats['lowest_bid'] = item_information['bids'][stats['winner']][0][1]
+    elif len(item_information['bids']) > 1:
+        # something
+        pass
+    else:
+        # something else
+        pass
+
+    return stats
 
 
 def calculate_stats(item: str):
 
     item_record = auction_records[item]
-    winning_stats = calculate_winning_stats()
+    winning_information = calculate_winning_stats(item_record)
 
     final_item_stats = [
         item_record['auction_end_time'],
         item,
-        winner,
-        sold_status,
-        price_to_pay,
-        total_bids,
-        highest_bid,
-        lowest_bid
+        winning_information['winner'],
+        winning_information['sold_status'],
+        winning_information['price_to_pay'],
+        winning_information['total_bids'],
+        winning_information['highest_bid'],
+        winning_information['lowest_bid']
     ]
 
-    print(final_item_stats, sep='|')
+    print_stats(final_item_stats)
 
 
 def close_auction(time: int):
@@ -79,7 +92,7 @@ def process_bid(bidding: list):
                 auction_records[item]['bids'][bidding_user].append(bid_amount)
         else:
             auction_records[item]['bids'].setdefault(bidding_user, [])
-            auction_records[item]['bids'][bidding_user].append(bid_amount)
+            auction_records[item]['bids'][bidding_user].append((bid_time, bid_amount))
 
 
 def process_input(line: str):
@@ -96,7 +109,7 @@ def process_input(line: str):
             raise ValueError("Could not find input action.")
 
     # check for any expiring items
-    close_auction(int(line[0]))
+    close_auction(int(split_line[0]))
 
 
 def load_input(auction_file: list):
