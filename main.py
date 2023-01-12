@@ -45,26 +45,13 @@ def collate_item_information(item_information: dict):
     stats = {}
 
     if len(item_information['bids']) >= 1:
-        winning_stats = determine_item_winner(item_information['bids'])
-
-        if winning_stats['highest_bid'][1] > item_information['reserve_price']:
-            stats['sold_status'] = "SOLD"
-        else:
-            stats['sold_status'] = "UNSOLD"
-
-        if stats['sold_status'] == "SOLD":
-            stats['winner'] = winning_stats['highest_bidder']
-        else:
-            stats['winner'] = ''
-
-        if stats['sold_status'] == "SOLD":
-            stats['price_to_pay'] = winning_stats['second_highest_bid'][1]
-        else:
-            stats['price_to_pay'] = 0.0
-
-        stats['total_bids'] = winning_stats['total_bids']
-        stats['highest_bid'] = winning_stats['highest_bid'][1]
-        stats['lowest_bid'] = winning_stats['lowest_bid']
+        winner = determine_item_winner(item_information['bids'])
+        stats['sold_status'] = "SOLD" if winner['highest_bid'][1] > item_information['reserve_price'] else "UNSOLD"
+        stats['winner'] = winner['highest_bidder'] if stats['sold_status'] == "SOLD" else ''
+        stats['price_to_pay'] = winner['second_highest_bid'][1] if stats['sold_status'] == "SOLD" else 0.0
+        stats['total_bids'] = winner['total_bids']
+        stats['highest_bid'] = winner['highest_bid'][1]
+        stats['lowest_bid'] = winner['lowest_bid']
     else:
         stats['winner'] = ''
         stats['price_to_pay'] = 0.0
