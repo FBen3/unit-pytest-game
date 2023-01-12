@@ -22,3 +22,4 @@ valid bid: 1. arrives AFTER auction start & BEFORE auction end time
 - look into whether code follows PEP8 and how that is checked (particularly here in PyCharm)
 - look into Black formatter
 - look into pylint (how to use pylist to disable false positives, wtv the fuck that means)
+- TODO: check the selling user doesn't/can't bid on his/her own item
