@@ -10,47 +10,63 @@ def print_stats(ending_stats: list):
     print(result)
 
 
-def calculate_winning_stats(item_information: dict):
+def determine_item_winner(bidders: dict):
+    highest_bidder = -1
+    highest_bid = (-1.0, -1.0)
+    second_highest_bid = (-1.0, -1.0)
+    total_bids = 0
+    lowest_bid = float('inf')
+
+    for user, bids in bidders.items():
+        final_bid_amount = bids[-1][1]
+        final_bid_time = bids[-1][0]
+        if final_bid_amount > highest_bid[1]:
+            second_highest_bid = highest_bid
+            highest_bid = bids[-1]
+            highest_bidder = user
+        elif final_bid_amount == highest_bid[1] and final_bid_time < highest_bid[0]:
+            highest_bidder = user
+        elif final_bid_amount > second_highest_bid[1] and final_bid_amount != highest_bid[1]:
+            second_highest_bid = bids[-1]
+        if bids[0][1] < lowest_bid:
+            lowest_bid = bids[0][1]
+        total_bids += len(bids)
+
+    return {
+        'highest_bidder': highest_bidder,
+        'highest_bid': highest_bid,
+        'second_highest_bid': second_highest_bid,
+        'total_bids': total_bids,
+        'lowest_bid': lowest_bid
+    }
+
+
+def collate_item_information(item_information: dict):
     stats = {}
 
-    if len(item_information['bids']) == 1:
-        stats['winner'] = list(item_information['bids'].keys())[0]
-        stats['sold_status'] = "SOLD"
-        stats['price_to_pay'] = item_information['reserve_price']
-        stats['total_bids'] = len(item_information['bids'][stats['winner']])
-        stats['highest_bid'] = item_information['bids'][stats['winner']][-1][1]
-        stats['lowest_bid'] = item_information['bids'][stats['winner']][0][1]
-    elif len(item_information['bids']) > 1:
-        highest_bidder = -1
-        highest_bid = -1.0
-        second_highest_bid = -1.0
-        total_bids = 0
-        lowest_bid = float('inf')
+    if len(item_information['bids']) >= 1:
+        winning_stats = determine_item_winner(item_information['bids'])
 
-        for user, bids in item_information['bids'].items():
-            final_bid_time = bids[-1][0]
-            final_bid_amount = bids[-1][1]
-            if final_bid_amount > highest_bid[1]:
-                second_highest_bid = highest_bid
-                highest_bid = bids[-1]
-                highest_bidder = user
-            elif final_bid_amount == highest_bid[1] and final_bid_time < highest_bid[0]:
-                highest_bidder = user
-            elif final_bid_amount > second_highest_bid[1] and final_bid_amount != highest_bid[1]:
-                second_highest_bid = bids[-1]
-            if bids[0][1] < lowest_bid:
-                lowest_bid = bids[0][1]
-            total_bids += len(bids)
+        if winning_stats['highest_bid'][1] > item_information['reserve_price']:
+            stats['sold_status'] = "SOLD"
+        else:
+            stats['sold_status'] = "UNSOLD"
 
-        stats['winner'] = highest_bidder
-        stats['sold_status'] = "SOLD"
-        stats['price_to_pay'] = second_highest_bid[1]
-        stats['total_bids'] = total_bids
-        stats['highest_bid'] = highest_bid[1]
-        stats['lowest_bid'] = lowest_bid
+        if stats['sold_status'] == "SOLD":
+            stats['winner'] = winning_stats['highest_bidder']
+        else:
+            stats['winner'] = ''
+
+        if stats['sold_status'] == "SOLD":
+            stats['price_to_pay'] = winning_stats['second_highest_bid'][1]
+        else:
+            stats['price_to_pay'] = 0.0
+
+        stats['total_bids'] = winning_stats['total_bids']
+        stats['highest_bid'] = winning_stats['highest_bid'][1]
+        stats['lowest_bid'] = winning_stats['lowest_bid']
     else:
         stats['winner'] = ''
-        stats['sold_status'] = "UNSOLD"
         stats['price_to_pay'] = 0.0
         stats['total_bids'] = 0
         stats['highest_bid'] = 0.0
@@ -59,9 +75,9 @@ def calculate_winning_stats(item_information: dict):
     return stats
 
 
-def calculate_stats(item: str):
+def calculate_item_stats(item: str):
     item_record = auction_records[item]
-    winning_information = calculate_winning_stats(item_record)
+    winning_information = collate_item_information(item_record)
 
     final_item_stats = [
         item_record['auction_end_time'],
@@ -80,7 +96,7 @@ def calculate_stats(item: str):
 def close_auction(time: int):
     if time in closing_records:
         for item in closing_records[time]:
-            calculate_stats(item)
+            calculate_item_stats(item)
 
 
 def process_sell(listing: list):
@@ -114,7 +130,7 @@ def process_bid(bidding: list):
         if bidding_user in auction_records[item]['bids']:
             # check that bid is larger than any previous bids
             if bid_amount > auction_records[item]['bids'][bidding_user][-1][1]:
-                auction_records[item]['bids'][bidding_user].append(bid_amount)
+                auction_records[item]['bids'][bidding_user].append((bid_time, bid_amount))
         else:
             auction_records[item]['bids'].setdefault(bidding_user, [])
             auction_records[item]['bids'][bidding_user].append((bid_time, bid_amount))
@@ -141,7 +157,6 @@ def load_input(auction_file: list):
         with open(auction_file[0], 'r') as reader:
             for line in reader:
                 process_input(line.strip())
-                print(auction_records) # remove later
     except (FileNotFoundError, IndexError) as e:
         print(e)
         print("Please enter a valid path.")
