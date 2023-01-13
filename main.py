@@ -18,18 +18,19 @@ def determine_item_winner(bidders: dict):
     lowest_bid = float('inf')
 
     for user, bids in bidders.items():
-        final_bid_amount = bids[-1][1]
-        final_bid_time = bids[-1][0]
-        if final_bid_amount > highest_bid[1]:
-            second_highest_bid = highest_bid
-            highest_bid = bids[-1]
-            highest_bidder = user
-        elif final_bid_amount == highest_bid[1] and final_bid_time < highest_bid[0]:
-            highest_bidder = user
-        elif final_bid_amount > second_highest_bid[1] and final_bid_amount != highest_bid[1]:
-            second_highest_bid = bids[-1]
-        if bids[0][1] < lowest_bid:
-            lowest_bid = bids[0][1]
+        for bid in bids:
+            bid_amount = bid[1]
+            bid_time = bid[0]
+            if bid_amount > highest_bid[1]:
+                second_highest_bid = highest_bid
+                highest_bid = bid
+                highest_bidder = user
+            elif bid_amount == highest_bid[1] and bid_time < highest_bid[0]:
+                highest_bidder = user
+            elif bid_amount > second_highest_bid[1] and bid_amount != highest_bid[1]:
+                second_highest_bid = bid
+            if bid_amount < lowest_bid:
+                lowest_bid = bid_amount
         total_bids += len(bids)
 
     return {
