@@ -9,7 +9,7 @@ def print_stats(ending_stats: list):
     result = '|'.join([f'{info:.2f}' if isinstance(info, float) else str(info) for info in ending_stats])
     print(result)
 
-ben
+
 def determine_item_winner(bidders: dict):
     highest_bidder = -1
     highest_bid = (-1.0, -1.0)
@@ -54,6 +54,7 @@ def collate_item_information(item_information: dict):
         stats['highest_bid'] = winner['highest_bid'][1]
         stats['lowest_bid'] = winner['lowest_bid']
     else:
+        stats['sold_status'] = "UNSOLD"
         stats['winner'] = ''
         stats['price_to_pay'] = 0.0
         stats['total_bids'] = 0
