@@ -40,7 +40,7 @@ for the same amount then the earliest bid wins the item.
 Given an input file containing instructions to both start auctions, and place bids. You must
 execute all instructions, and output for each item (upon the auction closing) the winning bid,
 the final price to be paid, and the user who has won the item as well as some basic stats about
-the auction. You will be provided a basic sample input file to help you test your program.
+the auction. You will be provided a basic sample input file to help you test your program.  
 <br>
 <br>
 **Input:**
@@ -81,7 +81,7 @@ in the absence of bids, they take the format:
 
 `timestamp`
 
-`timestamp` will be an integer representing a unix epoch time.
+`timestamp` will be an integer representing a unix epoch time  
 <br>
 <br>
 **Expected Output:**
