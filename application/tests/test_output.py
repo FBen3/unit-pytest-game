@@ -1,9 +1,3 @@
-"""Output testing module.
-
-This module holds various test for outputting
-the correct results.
-
-"""
 import unittest
 from unittest.mock import patch
 
