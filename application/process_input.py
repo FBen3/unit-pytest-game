@@ -42,6 +42,7 @@ def load_input(auction_file: list):
     except (FileNotFoundError, IndexError) as e:
         print(e)
         print("Please enter a valid path.")
-    except:
+    except Exception as e:
+        print(e)
         print("Unexpected error occurred")
         raise
