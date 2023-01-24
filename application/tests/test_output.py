@@ -1,3 +1,9 @@
+"""Output testing module.
+
+This module holds various test for outputting
+the correct results.
+
+"""
 import unittest
 from unittest.mock import patch
 
@@ -6,18 +12,16 @@ from application.process_output import print_stats
 
 class TestOutput(unittest.TestCase):
 
-    # change/update this so it actually makes sense
+
     @patch('builtins.print')
-    def test_output_parser(self, mocked_print):
-        print_stats(['toaster', 10, 20.2])
-        mocked_print.assert_called_with('toaster|10|20.20')
+    def test_output_with_all_stats_filled(self, mocked_print):
+        print_stats(['20', 'toaster_1', 8, 'SOLD', 12.50, 3, 20.00, 7.50])
+        mocked_print.assert_called_with('20|toaster_1|8|SOLD|12.50|3|20.00|7.50')
 
-
-    # add more tests ...
-
-    # if I want to test that a function raises an error
-    #     with self.assertRaises(ValueError):
-    #         print_stats()
+    @patch('builtins.print')
+    def test_output_with_missing_stats(self, mocked_print):
+        print_stats(['20', 'tv_1', '', 'UNSOLD', 0.0, 2, 200.0, 150.0])
+        mocked_print.assert_called_with('20|tv_1||UNSOLD|0.00|2|200.00|150.00')
 
 
 if __name__ == '__main__':
