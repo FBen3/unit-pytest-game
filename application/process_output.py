@@ -1,8 +1,8 @@
 """Output processing module.
 
-This module contains the logic to parse a list
-of item stats accumulated throughout the game,
-and print it in a pipe-delimited format.
+This module contains the logic to parse a list of
+item stats accumulated throughout the game, and print
+it in a pipe-delimited format.
 
 """
 
