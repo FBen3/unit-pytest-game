@@ -15,9 +15,11 @@ Example formats
     timestamp
 
 """
+import os
+
 from auction import process_sell, process_bid, close_auction
 
-
+# TODO: test / throw error if line is NOT pipedelimieted
 def process_input(line: str):
     split_line = line.split('|')
 
@@ -34,15 +36,20 @@ def process_input(line: str):
     close_auction(int(split_line[0]))
 
 
-def load_input(auction_file: list):
-    try:
-        with open(auction_file[0], 'r') as reader:
-            for line in reader:
-                process_input(line.strip())
-    except (FileNotFoundError, IndexError) as e:
-        print(e)
-        print("Please enter a valid path.")
-    except Exception as e:
-        print(e)
-        print("Unexpected error occurred")
-        raise
+def load_input(arguments: list):
+
+    if len(arguments) > 1:
+        raise IndexError("Please specify only 1 argument")
+    else:
+        path_argument = arguments[0]
+        if os.path.isfile(path_argument):
+            file_name = os.path.basename(path_argument)
+            _, extension = file_name.split('.')
+            if extension == 'txt':
+                with open(path_argument, 'r') as reader:
+                    for line in reader:
+                        process_input(line.strip())
+            else:
+                raise TypeError("Input must be a .txt file")
+        else:
+            raise FileNotFoundError("Could not find file")
