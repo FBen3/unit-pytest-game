@@ -3,7 +3,7 @@
 Some description.
 
 """
-from process_output import print_stats
+from application.process_output import print_stats
 
 
 auction_records = {}

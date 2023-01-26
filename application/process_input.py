@@ -17,7 +17,8 @@ Example formats
 """
 import os
 
-from auction import process_sell, process_bid, close_auction
+from application.auction import process_sell, process_bid, close_auction
+
 
 # TODO: test / throw error if line is NOT pipedelimieted
 def process_input(line: str):
