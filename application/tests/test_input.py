@@ -7,11 +7,10 @@ class TestInput(unittest.TestCase):
 
 
     def test_only_one_argument_is_specified(self):
-
         with self.assertRaises(IndexError) as context:
-            load_input(['ben','ben'])
+            load_input(['input_1.txt','input_2.txt'])
 
-        # self.assertTrue("Too many arguments given" in str(context.exception))
+        self.assertTrue("Please specify only 1 argument" in str(context.exception))
 
     @patch("os.path.isfile")
     def test_user_argument_is_a_text_file(self, mock_isfile):
