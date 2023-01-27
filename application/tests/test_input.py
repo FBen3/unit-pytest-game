@@ -13,7 +13,13 @@ class TestInput(unittest.TestCase):
 
         # self.assertTrue("Too many arguments given" in str(context.exception))
 
+    @patch("os.path.isfile")
+    def test_user_argument_is_a_text_file(self, mock_isfile):
+        mock_isfile.return_value = True
+        with self.assertRaises(TypeError) as context:
+            load_input(['not_text_file.json'])
 
+        self.assertTrue("Input must be a .txt file" in str(context.exception))
 
 
     # def test_user_argument_is_a_text_file(self):
