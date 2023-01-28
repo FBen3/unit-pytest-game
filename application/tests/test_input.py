@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from application.process_input import load_input
+from application.process_input import load_input, process_input
 
 
 class TestInput(unittest.TestCase):
@@ -35,18 +35,18 @@ class TestInput(unittest.TestCase):
 
         self.assertTrue("Please specify 1 argument" in str(context.exception))
 
-    # def test_input_file_is_pipe_delimited(self):
-    #     return
+    def test_data_is_SELL_or_BID_type(self):
+        with self.assertRaises(ValueError) as context:
+            process_input("10|1|BUY|toaster_1|10.00|20")
 
+        self.assertTrue("Could not find input action" in str(context.exception))
 
+    def test_heartbeat_message_check(self):
+        with self.assertRaises(ValueError) as context:
+            process_input("18,")
 
+        self.assertTrue("Unrecognised data in row" in str(context.exception))
 
 
 if __name__ == '__main__':
     unittest.main()
-
-# if I want to test that a function raises an error
-#     with self.assertRaises(ValueError):
-#         print_stats()
-
-

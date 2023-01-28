@@ -20,7 +20,6 @@ import os
 from application.auction import process_sell, process_bid, close_auction
 
 
-# TODO: test / throw error if line is NOT pipedelimieted
 def process_input(line: str):
     split_line = line.split('|')
 
@@ -31,16 +30,18 @@ def process_input(line: str):
         elif split_line[2] == "BID":
             process_bid(split_line)
         else:
-            raise ValueError("Could not find input action.")
+            raise ValueError("Could not find input action")
 
-    # check for any expiring items
-    close_auction(int(split_line[0]))
+    try:
+        # check for any expiring items
+        close_auction(int(split_line[0]))
+    except ValueError as e:
+        raise ValueError("Unrecognised data in row")
 
 
 def load_input(arguments: list):
-
-    if len(arguments) > 1:
-        raise IndexError("Please specify only 1 argument")
+    if len(arguments) != 1:
+        raise IndexError("Please specify 1 argument")
     else:
         path_argument = arguments[0]
         if os.path.isfile(path_argument):
@@ -51,6 +52,6 @@ def load_input(arguments: list):
                     for line in reader:
                         process_input(line.strip())
             else:
-                raise TypeError("Input must be a .txt file")
+                raise TypeError("Input must be a text file")
         else:
             raise FileNotFoundError("Could not find file")
