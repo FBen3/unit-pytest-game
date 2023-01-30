@@ -1,41 +1,30 @@
+import io
+import os
 import unittest
 from unittest.mock import patch
 
 import application.auction as auction
+import application.process_input as process_input
 
+
+DEFAULT_INPUT = os.path.join(os.path.dirname(__file__), 'fixtures/default_input.txt')
 
 class TestAuction(unittest.TestCase):
 
+    @patch('builtins.print')
+    def test_default_input(self, mocked_print):
+        process_input.load_input([DEFAULT_INPUT])
 
-    # TODO: I think ...
-    """
-    Start looking into fixtures tomorrow and create different input files
-    with various auction scenario. Then, write test here...
-
-    1st test could be test_default_interview_inpuit(): which then tests the default
-    input txt file.
-
-    Then create another .txt file with another scenario. Write a second test for that
-    .txt file / scenario / action
-
-    and so, and so on. I think that's what this file should contain.
+        mocked_print.assert_called_with("20|tv_1||UNSOLD|0.00|2|200.00|150.00")
 
 
-    
-    """
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def test_default_input_2(self, mocked_stdout):
+        expected_output = "20|toaster_1|8|SOLD|12.50|3|20.00|7.50\n" \
+                          "20|tv_1||UNSOLD|0.00|2|200.00|150.00\n"
+        process_input.load_input([DEFAULT_INPUT])
 
-
-
-    def test_determine_item_winner(self):
-
-        auction.process_bid([12, 8, 'BID', 'toaster_1', 7.50])
-
-
-        pass
-
-
-
-
+        self.assertEqual(mocked_stdout.getvalue(), expected_output)
 
 
 
