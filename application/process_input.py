@@ -3,7 +3,7 @@
 This module contains the logic to load and read
 a pipe-delimited .txt file.
 
-Example formats
+Example input formats
 
     item listing:
     timestamp|user_id|action|item|reserve_price|close_time
