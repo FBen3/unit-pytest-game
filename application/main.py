@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import sys
 
 from application.process_input import load_input
