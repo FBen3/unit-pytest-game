@@ -3,7 +3,7 @@
 This module contains the logic to load and read
 a pipe-delimited .txt file.
 
-Example formats
+Example input formats
 
     item listing:
     timestamp|user_id|action|item|reserve_price|close_time
@@ -15,6 +15,8 @@ Example formats
     timestamp
 
 """
+import os
+
 from auction import process_sell, process_bid, close_auction
 
 
@@ -28,20 +30,28 @@ def process_input(line: str):
         elif split_line[2] == "BID":
             process_bid(split_line)
         else:
-            raise ValueError("Could not find input action.")
+            raise ValueError("Could not find input action")
 
-    # check for any expiring items
-    close_auction(int(split_line[0]))
-
-
-def load_input(auction_file: list):
     try:
-        with open(auction_file[0], 'r') as reader:
-            for line in reader:
-                process_input(line.strip())
-    except (FileNotFoundError, IndexError) as e:
-        print(e)
-        print("Please enter a valid path.")
-    except:
-        print("Unexpected error occurred")
-        raise
+        # check for any expiring items
+        close_auction(int(split_line[0]))
+    except ValueError as e:
+        raise ValueError("Unrecognised data in row")
+
+
+def load_input(arguments: list):
+    if len(arguments) != 1:
+        raise IndexError("Please specify 1 argument")
+    else:
+        path_argument = arguments[0]
+        if os.path.isfile(path_argument):
+            file_name = os.path.basename(path_argument)
+            _, extension = file_name.split('.')
+            if extension == 'txt':
+                with open(path_argument, 'r') as reader:
+                    for line in reader:
+                        process_input(line.strip())
+            else:
+                raise TypeError("Input must be a text file")
+        else:
+            raise FileNotFoundError("Could not find file")
