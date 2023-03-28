@@ -1,6 +1,7 @@
-"""Some title.
+"""Auction Processing module.
 
-Some description.
+This module contains all the logic and processing of an
+auction. Including determining a winner if there is one.
 
 """
 from process_output import print_stats
