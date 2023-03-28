@@ -45,7 +45,6 @@ You will receive a pipe-delimited input file representing the started auctions, 
 first entry on each line of this file will be a timestamp, the file will be strictly in-order
 of timestamp. There are three types of rows found in this file:
 
-
 1) Users listing items for sale.
 
 This appears in the format:
@@ -59,7 +58,6 @@ timestamp|user_id|action|item|reserve_price|close_time
 `reserve_price` is a decimal representing the item reserve price in the site's local currency.
 `close_time` will be an integer representing a unix epoch time
 
-
 2) Bids on items
 
 This will appear in the format:
@@ -71,7 +69,6 @@ timestamp|user_id|action|item|bid_amount
 `action` will be the string "BID"
 `item` is a unique string code for that item.
 `bid_amount` is a decimal representing a bid in the auction site's local currency.
-
 
 3) Heartbeat messages
 
