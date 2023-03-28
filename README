@@ -72,6 +72,7 @@ timestamp|user_id|action|item|bid_amount
 `item` is a unique string code for that item.
 `bid_amount` is a decimal representing a bid in the auction site's local currency.
 
+
 3) Heartbeat messages
 
 These messages may appear periodically in the input to ensure that auctions can be closed
