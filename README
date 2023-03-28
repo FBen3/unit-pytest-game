@@ -12,7 +12,7 @@ Requirements:
    language freely, but not other third-party libraries. In your test code you may use
    common third-party test packages (e.g. pytest, junit, testify).
  - [ ] Please produce production-quality code, providing tests and comments where necessary.
- - [ ] Provide all source code, ideally in a zip file / tarball so that it can be checked out and
+ - [x] Provide all source code, ideally in a zip file / tarball so that it can be checked out and
    built.
  - [x] Ensure your solution takes a user supplied path to the input file as a command line argument.
  - [ ] Provide a brief README file with instructions on how to build/run your program (and tests if
@@ -60,7 +60,6 @@ timestamp|user_id|action|item|reserve_price|close_time
 `item` is a unique string code for that item.
 `reserve_price` is a decimal representing the item reserve price in the site's local currency.
 `close_time` will be an integer representing a unix epoch time
-
 
 2) Bids on items
 
