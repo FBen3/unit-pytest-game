@@ -1,5 +1,5 @@
 [Note: this branch is only intended for the game itself. Unittest & Pytest tests will each have their separate
-branches.]
+branches]
 
 ===========================================
 THOUGHT MACHINE
@@ -13,7 +13,7 @@ Requirements:
    common third-party test packages (e.g. pytest, junit, testify).
  - [ ] Please produce production-quality code, providing tests and comments where necessary.
  - [ ] Provide all source code, ideally in a zip file / tarball so that it can be checked out and
-   built. Please do not share or upload the code anywhere else (e.g. Github).
+   built.
  - [x] Ensure your solution takes a user supplied path to the input file as a command line argument.
  - [ ] Provide a brief README file with instructions on how to build/run your program (and tests if
    present) - and any assumptions made
