@@ -30,7 +30,6 @@ At the end of the auction the winner will pay the price of the second highest bi
 is only a single valid bid they will pay the reserve price of the auction. If two bids are received
 for the same amount then the earliest bid wins the item.
 
-
 ===========================================
 
 ** EXERCISE **
@@ -45,6 +44,7 @@ Input:
 You will receive a pipe-delimited input file representing the started auctions, and bids. The
 first entry on each line of this file will be a timestamp, the file will be strictly in-order
 of timestamp. There are three types of rows found in this file:
+
 
 1) Users listing items for sale.
 
