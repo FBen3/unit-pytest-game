@@ -11,7 +11,7 @@ Requirements:
  - [x] You must use either Java, Python or Go. You may use the standard library for your
    language freely, but not other third-party libraries. In your test code you may use
    common third-party test packages (e.g. pytest, junit, testify).
- - [ ] Please produce production-quality code, providing tests and comments where necessary.
+ - [x] Please produce production-quality code, providing tests and comments where necessary.
  - [x] Provide all source code, ideally in a zip file / tarball so that it can be checked out and
    built.
  - [x] Ensure your solution takes a user supplied path to the input file as a command line argument.
