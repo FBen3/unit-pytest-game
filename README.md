@@ -1,3 +1,4 @@
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) 
 ---
 
 ### THOUGHT MACHINE
@@ -6,16 +7,31 @@
 
 ---
 
+Assumptions:
+
+ - all source code is located inside `application`
+ - `Python 3.10` was used during development & testing
+ - Testing framework:`UnitTest`
+ - program expects a user supplied path to an input file
+
+Quickstart:
+
+ - **Run**: `python3 -m application.main <file_path>`
+ - **Run Test Suite**: `python3 -m unittest discover application/tests -p "test_*.py"`
+ - **Run Individual Test**: `python3 -m unittest application.tests.<test_file_name>`
+
+---
+
 Requirements:
  - [x] Please complete the following programming exercise. Allow for about 4-6 hours.
  - [x] You must use either Java, Python or Go. You may use the standard library for your
    language freely, but not other third-party libraries. In your test code you may use
    common third-party test packages (e.g. pytest, junit, testify).
- - [ ] Please produce production-quality code, providing tests and comments where necessary.
- - [ ] Provide all source code, ideally in a zip file / tarball so that it can be checked out and
-   built. Please do not share or upload the code anywhere else (e.g. Github).
+ - [x] Please produce production-quality code, providing tests and comments where necessary.
+ - [x] Provide all source code, ideally in a zip file / tarball so that it can be checked out and
+   built.
  - [x] Ensure your solution takes a user supplied path to the input file as a command line argument.
- - [ ] Provide a brief README file with instructions on how to build/run your program (and tests if
+ - [x] Provide a brief README file with instructions on how to build/run your program (and tests if
    present) - and any assumptions made
 
 ---
