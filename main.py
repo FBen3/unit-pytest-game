@@ -4,7 +4,7 @@ import sys
 from process_input import load_input
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     path = sys.argv[1:]
     load_input(path)
 

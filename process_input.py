@@ -21,7 +21,7 @@ from auction import process_sell, process_bid, close_auction
 
 
 def process_input(line: str):
-    split_line = line.split('|')
+    split_line = line.split("|")
 
     # do not process heartbeat messages
     if len(split_line) > 1:
@@ -46,9 +46,9 @@ def load_input(arguments: list):
         path_argument = arguments[0]
         if os.path.isfile(path_argument):
             file_name = os.path.basename(path_argument)
-            _, extension = file_name.split('.')
-            if extension == 'txt':
-                with open(path_argument, 'r') as reader:
+            _, extension = file_name.split(".")
+            if extension == "txt":
+                with open(path_argument, "r") as reader:
                     for line in reader:
                         process_input(line.strip())
             else:
