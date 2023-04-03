@@ -8,5 +8,10 @@ it in a pipe-delimited format.
 
 
 def print_stats(ending_stats: list):
-    result = '|'.join([f'{info:.2f}' if isinstance(info, float) else str(info) for info in ending_stats])
+    result = "|".join(
+        [
+            f"{info:.2f}" if isinstance(info, float) else str(info)
+            for info in ending_stats
+        ]
+    )
     print(result)
