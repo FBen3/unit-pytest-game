@@ -30,7 +30,7 @@ def process_input(line: str):
         elif split_line[2] == "BID":
             process_bid(split_line)
         else:
-            raise ValueError("Could not find input action")
+            raise ValueError("action must be SELL or BID")
 
     try:
         # check for any expiring items
