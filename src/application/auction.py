@@ -4,7 +4,7 @@ This module contains all the logic and processing of an
 auction. Including determining a winner if there is one.
 
 """
-from process_output import print_stats
+from src.application.process_output import print_stats
 
 
 auction_records = {}

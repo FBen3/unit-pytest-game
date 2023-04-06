@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
 import sys
 
-from process_input import load_input
+from src.application.process_input import load_input
 
 
 if __name__ == "__main__":

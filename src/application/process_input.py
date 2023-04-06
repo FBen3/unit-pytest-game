@@ -17,7 +17,7 @@ Example input formats
 """
 import os
 
-from auction import process_sell, process_bid, close_auction
+from src.application.auction import process_sell, process_bid, close_auction
 
 
 def process_input(line: str):
