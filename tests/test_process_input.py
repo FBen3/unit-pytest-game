@@ -1,9 +1,3 @@
-"""Test module for input processing.
-
-This module contains all tests assessing
-the logic in `process_input.py`
-
-"""
 from unittest.mock import patch
 
 import pytest
