@@ -9,9 +9,3 @@ def sold_stat_example():
 @pytest.fixture(scope="function")
 def unsold_stat_example():
     return ["20", "tv_1", "", "UNSOLD", 0.0, 2, 200.0, 150.0]
-
-
-
-
-
-
