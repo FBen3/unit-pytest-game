@@ -16,6 +16,6 @@ Assumptions:
 
 Quickstart:
 
- - **Run**: 
- - **Run Test Suite**: 
- - **Run Individual Test**: 
+ - **Run**: `python3 -m src.application.main <file_path>`
+ - **Run Test Suite**: `pytest`
+ - **Run Individual Test**: `pytest tests/<file_name>`
