@@ -9,10 +9,10 @@
 
 Assumptions:
 
- - all source code is located inside `application`
+ - All source code is located inside `application`
  - `Python 3.10` was used during development & testing
  - Testing framework:`Pytest`
- - program expects a user supplied path to an input file
+ - Program expects a user supplied path to an input file
 
 Quickstart:
 
