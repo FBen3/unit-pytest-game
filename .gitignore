@@ -1,6 +1,9 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
+# Distribution / packaging
+.pytest_cache/
+
 # PyCharm
 .idea
 
@@ -8,3 +11,7 @@ __pycache__/
 my_test.txt
 my_notes.txt
 my_plan.txt
+
+auction.py
+process_input.py
+process_output.py
