@@ -1,48 +1,31 @@
 from dataclasses import dataclass, field, asdict
 
 
-
-# @dataclass
-# class AuctionData:
-#     timestamp: int
-#     user_id: int
-#     action: str
-#     item: str
-#
-#     def __post_init__(self):
-#         self.timestamp = int(self.timestamp)
-#         self.user_id = int(self.user_id)
-#
-#
-# @dataclass
-# class Bid(AuctionData):
-#     bid_amount: float
-
-
 @dataclass
 class Item:
+    auction_start_time: int
+    seller: int
+    item: str
     reserve_price: float
     auction_end_time: int
     status: str = "UNSOLD"
     bids: dict = field(default_factory=dict)
 
     def __post_init__(self):
-        del self.action
+        self.auction_start_time = int(self.auction_start_time)
+        self.seller = int(self.seller)
         self.reserve_price = float(self.reserve_price)
         self.auction_end_time = int(self.auction_end_time)
 
-    @property
-    def auction_start_time(self):
-        return self.timestamp
+    def largest_bid(self, bidder):
+        return self.bids[bidder][-1][1]
 
-    @property
-    def seller(self):
-        return self.user_id
-
-    def listing_record(self):
-        print(asdict(self))
-        return asdict(self)
-
-
+    def submit_bid(self, bidder, time, amount):
+        if bidder in self.bids:
+            if amount > self.largest_bid(bidder):
+                self.bids[bidder].append((time, amount))
+        else:
+            self.bids.setdefault(bidder, [])
+            self.bids[bidder].append((time, amount))
 
 
