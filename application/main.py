@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 
-from auction_cls import Auction
+from auction import Auction
 
 
 if __name__ == "__main__":
