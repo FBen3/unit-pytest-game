@@ -62,10 +62,7 @@ class Auction:
             else:
                 raise FileNotFoundError("Could not find file")
 
-    def close(self, time: int):
-        for item in self.closing_records[time]:
-            self.calculate_item_stats(item)
-
-
-
-
+    def close(self):
+        for time in self.closing_records:
+            for item in self.closing_records[time]:
+                self.auction_records[item].winner()
