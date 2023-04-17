@@ -1,6 +1,6 @@
 import os
 
-from item import Item
+from application.item import Item
 
 
 class Auction:

@@ -16,6 +16,6 @@ Assumptions:
 
 Quickstart:
 
- - **Run**: 
+ - **Run**: `python3 -m application.main <file_path>`
  - **Run Test Suite**: 
  - **Run Individual Test**: 
