@@ -21,4 +21,4 @@ Quickstart:
  - **Run Test Suite**: `pytest`
  - **Run Individual Test**: `pytest test/<file_name>`
  - **Run only Unit Tests**: `pytest -m unit`
- - **Run select group of Tests** `pytest -k <test_class_name>`
+ - **Run select Group of Tests** `pytest -k <test_class_name>`
