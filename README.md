@@ -20,4 +20,4 @@ Quickstart:
  - **Run**: `python3 -m application.main <file_path>`
  - **Run test suite**: `pytest`
  - **Run unit tests**: `pytest -m unit`
- - **Run a group of tests** `pytest -k <test_class_name>`
+ - **Run a group of tests**: `pytest -k <test_class_name>`
