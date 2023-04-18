@@ -4,8 +4,6 @@ from application.item import Item
 
 
 class Auction:
-
-
     def __init__(self, input_file):
         self.input_file = input_file
         self.auction_records = {}
@@ -28,7 +26,9 @@ class Auction:
         bid_amount = float(bidding[4])
 
         if (item_start_time < bid_time < item_close_time) and (bid_amount > 0):
-            self.auction_records[item].submit_bid(bidding_user, bid_time, bid_amount)
+            self.auction_records[item].submit_bid(
+                bidding_user, bid_time, bid_amount
+            )
 
     def process_input(self, line: str):
         split_line = line.split("|")

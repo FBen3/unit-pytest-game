@@ -48,9 +48,9 @@ class Item:
                     second_highest_bid = highest_bid
                     highest_bid = bid
                     highest_bidder = user
-                elif bid_amount == highest_bid[1] and bid_time < highest_bid[0]:
+                elif bid_amount == highest_bid[1] and bid_time < highest_bid[0]: # fmt: skip
                     highest_bidder = user
-                elif bid_amount > second_highest_bid[1] and bid_amount != highest_bid[1]:
+                elif bid_amount > second_highest_bid[1] and bid_amount != highest_bid[1]: # fmt: skip
                     second_highest_bid = bid
                 if bid_amount < lowest_bid:
                     lowest_bid = bid_amount
@@ -59,12 +59,12 @@ class Item:
             highest_bidder if self.status == "SOLD" else "",
             second_highest_bid[1] if self.status == "SOLD" else 0.00,
             highest_bid[1],
-            lowest_bid
+            lowest_bid,
         ]
 
     def calculate_winning_stats(self):
         if self.bid_count >= 1:
-            item_winner, price_paid, highest_bid, lowest_bid = self.determine_item_winner() # fmt: skip
+            item_winner, price_paid, highest_bid, lowest_bid = self.determine_item_winner()  # fmt: skip
 
             return [
                 self.auction_end_time,
@@ -74,7 +74,7 @@ class Item:
                 price_paid,
                 self.bid_count,
                 highest_bid,
-                lowest_bid
+                lowest_bid,
             ]
 
         # if item received 0 bids
@@ -86,11 +86,16 @@ class Item:
             0.0,
             0,
             0.0,
-            0.0
+            0.0,
         ]
 
     def winner(self):
         winning_stats = self.calculate_winning_stats()
-        result = "|".join([f"{info:.2f}" if isinstance(info, float) else str(info) for info in winning_stats])
+        result = "|".join(
+            [
+                f"{info:.2f}" if isinstance(info, float) else str(info)
+                for info in winning_stats
+            ]
+        )
 
         print(result)

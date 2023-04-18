@@ -8,11 +8,13 @@ from application.item import Item
 
 
 class TestDefaultInput:
-
-
     @classmethod
     def setup_class(cls):
-        cls.default_live_auction = [os.path.join(os.path.dirname(__file__), "integration", "default_input.txt")]
+        cls.default_live_auction = [
+            os.path.join(
+                os.path.dirname(__file__), "integration", "default_input.txt"
+            )
+        ]
 
     @pytest.mark.integration
     def test_default_live_auction(self, capfd):
@@ -31,8 +33,6 @@ class TestDefaultInput:
 
 
 class TestAuction:
-
-
     @pytest.mark.unit
     def test_process_listing(self):
         auction = Auction("")
@@ -44,22 +44,20 @@ class TestAuction:
 
 
 class TestItem:
-
-
     @pytest.mark.unit
     def test_post_init_values(self):
         # input parameters violate expected type
         test_item = Item("13", "78", "test_item", "5", "15")
 
         assert asdict(test_item) == {
-            'auction_end_time': 15,
-            'auction_start_time': 13,
-            'bid_count': 0,
-            'bids': {},
-            'item': 'test_item',
-            'reserve_price': 5.0,
-            'seller': 78,
-            'status': 'UNSOLD'
+            "auction_end_time": 15,
+            "auction_start_time": 13,
+            "bid_count": 0,
+            "bids": {},
+            "item": "test_item",
+            "reserve_price": 5.0,
+            "seller": 78,
+            "status": "UNSOLD",
         }
 
     @pytest.mark.unit
