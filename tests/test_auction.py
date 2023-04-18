@@ -1,12 +1,12 @@
-import pytest
-
 import os
+
+import pytest
 
 from application.auction import Auction
 from application.item import Item
 
 
-class TestDefaultAuction:
+class TestDefaultInput:
 
     @classmethod
     def setup_class(cls):
@@ -25,6 +25,23 @@ class TestDefaultAuction:
         )
 
         assert out == expected_output
+
+
+class TestAuction:
+
+
+    @pytest.mark.unit
+    def test_process_listing(self):
+        auction = Auction("")
+        example_item = Item(15, 1, "test_item", 10, 25)
+        auction.process_listing(example_item)
+
+        assert auction.auction_records == {"test_item": example_item}
+        assert auction.closing_records == {25: ["test_item"]}
+
+
+class TestItem:
+    pass
 
 
 

@@ -10,6 +10,7 @@ class Item:
     auction_end_time: int
     status: str = "UNSOLD"
     bids: dict = field(default_factory=dict)
+    bid_count: int = field(init=False, default=0)
 
     def __post_init__(self):
         self.auction_start_time = int(self.auction_start_time)
@@ -28,7 +29,10 @@ class Item:
             self.bids.setdefault(bidder, [])
             self.bids[bidder].append((time, amount))
 
-        self.status = "SOLD"
+        if amount >= self.reserve_price:
+            self.status = "SOLD"
+
+        self.bid_count += 1
 
     def determine_item_winner(self):
         highest_bidder = -1
@@ -51,10 +55,15 @@ class Item:
                 if bid_amount < lowest_bid:
                     lowest_bid = bid_amount
 
-        return [highest_bidder, second_highest_bid[1], highest_bid[1], lowest_bid]
+        return [
+            highest_bidder if self.status == "SOLD" else "",
+            second_highest_bid[1] if self.status == "SOLD" else 0.00,
+            highest_bid[1],
+            lowest_bid
+        ]
 
     def calculate_winning_stats(self):
-        if len(self.bids) >= 1:
+        if self.bid_count >= 1:
             item_winner, price_paid, highest_bid, lowest_bid = self.determine_item_winner() # fmt: skip
 
             return [
@@ -63,7 +72,7 @@ class Item:
                 item_winner,
                 self.status,
                 price_paid,
-                len(self.bids),
+                self.bid_count,
                 highest_bid,
                 lowest_bid
             ]
