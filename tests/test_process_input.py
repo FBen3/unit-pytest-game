@@ -43,7 +43,5 @@ def test_user_argument_is_a_text_file(mock_isfile):
 @patch("os.path.isfile")
 def test_input_file_not_found(mock_isfile):
     mock_isfile.return_value = False
-    with pytest.raises(FileNotFoundError) as e_info:
+    with pytest.raises(FileNotFoundError, match="^Could not find file$"):
         process_input.load_input(["non_existent_file.txt"])
-
-    assert str(e_info.value) == "Could not find file"
