@@ -1,21 +1,14 @@
-import sys
+import argparse
 
 from application.auction import Auction
 
 
 if __name__ == "__main__":
-    path = sys.argv[1:]
+    parser = argparse.ArgumentParser(description="Arguments for auction behavior.")
+    parser.add_argument('path', help='Path to input .txt file')
+    parser.add_argument('--save', '-s', action='store_true')
+    args = parser.parse_args()
 
-    auction = Auction()
-    # auction.start(path)
-    # # auction.start(path, time=5)
-    # # auction.report()
-    # auction.close()
+    Auction(args.path, args.save)
 
     print("\nUnitPytestGame")
-
-
-
-# cur.close()
-# conn.close()
-
