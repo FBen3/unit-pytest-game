@@ -1,6 +1,6 @@
 import psycopg2
 
-from config import db_conn_params
+from application.config import db_conn_params
 
 
 def process_bidding(bid_time, bidder, item, amount):

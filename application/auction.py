@@ -3,7 +3,7 @@ import os
 import psycopg2
 
 from application.db_procedures import *
-from config import db_conn_params
+from application.config import db_conn_params
 
 
 class Auction:
