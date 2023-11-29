@@ -3,86 +3,50 @@ import os
 import psycopg2
 
 from application.db_procedures import *
-
-
-### move this out after ###
-db_conn_params = {
-    "dbname": "auction_db",
-    "user": "benf",
-    "password": "superusrpass",
-    "host": "localhost",
-    "port": "5432"
-}
+from config import db_conn_params
 
 
 class Auction:
 
 
-    def __init__(self):
-        self.initialize_tables()
+    def __init__(self, input_path, save_option):
+        self.initialize_tables(save_option)
+        self.start(input_path)
 
     @staticmethod
-    def create_auction_table(connection):
-        print("\t- Creating auction table")
-
-        with connection.cursor() as cur:
-            cur.execute("""
-                CREATE TABLE auction (
-                    item            VARCHAR(30)     PRIMARY KEY NOT NULL,
-                    seller          INTEGER                     NOT NULL,
-                    reserve_price   NUMERIC(4, 2)               NOT NULL,
-                    opening_time    INTEGER                     NOT NULL,
-                    closing_time    INTEGER                     NOT NULL,
-                    status          VARCHAR(6)
-                );
-            """)
-
-    @staticmethod
-    def create_bids_table(connection):
-        print("\t- Creating bids table")
-
-        with connection.cursor() as cur:
-            cur.execute("""
-                CREATE TABLE bids (
-                    id          SERIAL          PRIMARY KEY,
-                    item        VARCHAR(30)     NOT NULL,
-                    amount      NUMERIC(4, 2)   NOT NULL,
-                    bid_time    INTEGER         NOT NULL,
-                    bidder      INTEGER         NOT NULL,
-                    FOREIGN KEY (item) REFERENCES auction(item)
-                );
-            """)
-
-    def initialize_tables(self):
+    def initialize_tables(save_database: bool):
         print("Initiating database setup:")
-        try:
-            # connect to database (open & close connections automatically)
-            with psycopg2.connect(**db_conn_params) as conn:
-                # manage database resources (cursor object)
-                with conn.cursor() as cur:
-                    cur.execute("""
-                        SELECT table_name
-                        FROM information_schema.tables
-                        WHERE table_schema = 'public'
-                    """)
-                    tables = cur.fetchall()
+        if not save_database:
+            try:
+                # connect to database (open & close connections automatically)
+                with psycopg2.connect(**db_conn_params) as conn:
+                    # manage database resources (cursor object)
+                    with conn.cursor() as cur:
+                        cur.execute("""
+                            SELECT table_name
+                            FROM information_schema.tables
+                            WHERE table_schema = 'public'
+                        """)
+                        tables = cur.fetchall()
 
-                    if tables:
-                        print("\t- Found existing tables")
-                        for table in tables:
-                            cur.execute(f"DROP TABLE {table[0]} CASCADE;")
-                        print(f"\t- Deleted tables: {tables}")
+                        if tables:
+                            print("\t- Found existing tables")
+                            for table in tables:
+                                cur.execute(f"DROP TABLE {table[0]} CASCADE;")
+                            print(f"\t- Deleted tables: {tables}")
 
-                self.create_auction_table(conn)
-                self.create_bids_table(conn)
+                    create_auction_table(conn)
+                    create_bids_table(conn)
 
-        except psycopg2.DatabaseError as e:
-            print(f"An error occurred while initializing DB tables: {e}")
-            raise e
+            except psycopg2.DatabaseError as e:
+                print(f"An error occurred while initializing DB tables: {e}")
+                raise e
 
-        except Exception as e:
-            print(f"Some error occurred: {e}")
-            raise e
+            except Exception as e:
+                print(f"Some error occurred: {e}")
+                raise e
+        else:
+            print(f"\t- Using existing database")
 
     @staticmethod
     def process_input(line: str):
@@ -109,22 +73,17 @@ class Auction:
                 raise ValueError("Could not find input action")
 
     def start(self, input_path):
-        if len(input_path) != 1:
-            raise IndexError("Please specify 1 argument")
-        else:
-            path_argument = input_path[0]
-            if os.path.isfile(path_argument):
-                file_name = os.path.basename(path_argument)
-                _, extension = file_name.split(".")
-                if extension == "txt":
-                    with open(path_argument, "r") as reader:
-                        for line in reader:
-                            self.process_input(line.strip())
-
-                else:
-                    raise TypeError("Input must be a text file")
+        if os.path.isfile(input_path):
+            file_name = os.path.basename(input_path)
+            _, extension = file_name.split(".")
+            if extension == "txt":
+                with open(input_path, "r") as reader:
+                    for line in reader:
+                        self.process_input(line.strip())
             else:
-                raise FileNotFoundError("Could not find file")
+                raise TypeError("Input must be a .txt file")
+        else:
+            raise FileNotFoundError("Could not find input file")
 
     def report(self):
         pass
@@ -133,8 +92,7 @@ class Auction:
         pass
 
 
-if __name__ == "__main__":
-    auction = Auction()
-    auction.start(['../my_test.txt'])
+# if __name__ == "__main__":
+#     auction = Auction('../my_test.txt', True)
 
 
