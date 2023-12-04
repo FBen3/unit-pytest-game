@@ -1,13 +1,9 @@
 import configparser
 import os
 
-# calculate current directory
+
 current_dir = os.path.abspath(os.path.dirname(__file__))
-
-# calculate project root
 root_dir = os.path.dirname(current_dir)
-
-# construct path to config.ini
 ini_config_path = os.path.join(root_dir, 'config.ini')
 
 config = configparser.ConfigParser()
