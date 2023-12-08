@@ -9,15 +9,23 @@
 
 Assumptions:
 
- - All source code is located inside 
- - `Python 3.10` was used during development & testing
- - Testing framework: `Pytest`
- - Program expects a user supplied path to an input file
- - Program is run from inside project root `UnitPytestGame` <-- right now this is unit-pytest-game ........ was changed cause you re-cloned the project I'm pretty sure
+- All source code, including tests are located inside 
+- `Python 3.10` was used during development & testing
+- Testing framework: `Pytest`
+- Program expects a user supplied path to an input file
+- Optional `-s`,`--save` flag to persist database between runs
+- Program can be run from anywhere [!!! make sure this is true !!!]
 
 Quickstart:
 
- - **Run**: 
- - **Run test suite**: 
- - **Run unit tests**: 
- - **Run a group of tests**:
+- **Run**: 
+- **Run test suite**: 
+- **Run unit tests**: 
+- **Run a group of tests**:
+
+Observations:
+
+- it's possible for an item to close while another is being listed or bet on
+- future feature is maybe to be able to read multiple files concurrently
+
+
