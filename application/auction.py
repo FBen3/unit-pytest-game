@@ -10,46 +10,10 @@ class Auction:
 
 
     def __init__(self, input_path, save_option):
-        self.initialize_tables(save_option)
+        initialize_tables(save_option)
         self.start(input_path)
 
-    @staticmethod
-    def initialize_tables(save_database: bool):
-        print("Initiating database setup:")
-        if not save_database:
-            try:
-                # connect to database (open & close connections automatically)
-                with psycopg2.connect(**db_conn_params) as conn:
-                    # manage database resources (cursor object)
-                    with conn.cursor() as cur:
-                        cur.execute("""
-                            SELECT table_name
-                            FROM information_schema.tables
-                            WHERE table_schema = 'public'
-                        """)
-                        tables = cur.fetchall()
-
-                        if tables:
-                            print("\t- Found existing tables")
-                            for table in tables:
-                                cur.execute(f"DROP TABLE {table[0]} CASCADE;")
-                            print(f"\t- Deleted tables: {tables}")
-
-                    create_auction_table(conn)
-                    create_bids_table(conn)
-
-            except psycopg2.DatabaseError as e:
-                print(f"An error occurred while initializing DB tables: {e}")
-                raise e
-
-            except Exception as e:
-                print(f"Some error occurred: {e}")
-                raise e
-        else:
-            print(f"\t- Using existing database")
-
-    @staticmethod
-    def process_input(line: str):
+    def process_input(self, line: str):
         split_line = line.split("|")
 
         # do not process heartbeat messages
