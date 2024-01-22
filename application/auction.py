@@ -1,9 +1,6 @@
 import os
 
-import psycopg2
-
 from application.db_procedures import *
-from application.config import db_conn_params
 
 
 class Auction:
@@ -11,10 +8,13 @@ class Auction:
 
     def __init__(self, input_path, save_option):
         initialize_tables(save_option)
+        self.auction_clock = 0
         self.start(input_path)
+        self.report()
 
     def process_input(self, line: str):
         split_line = line.split("|")
+        self.auction_clock = split_line[0]
 
         # do not process heartbeat messages
         if len(split_line) > 1:
@@ -49,14 +49,13 @@ class Auction:
         else:
             raise FileNotFoundError("Could not find input file")
 
+    # 20|toaster_1|8|SOLD|12.50|3|20.00|7.50
+    # 20|tv_1||UNSOLD|0.00|2|200.00|150.00
+
+
     def report(self):
         pass
 
-    def close(self):
-        pass
 
-
-# if __name__ == "__main__":
-#     auction = Auction('../my_test.txt', True)
 
 
