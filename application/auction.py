@@ -16,10 +16,8 @@ class Auction:
         split_line = line.split("|")
         self.auction_clock = split_line[0]
 
-        # do not process heartbeat messages
-        if len(split_line) > 1:
+        if len(split_line) > 1: # do not process heartbeat messages
             if split_line[2] == "SELL":
-                # exclude 'SELL' string
                 del split_line[2]
                 try:
                     process_listing(*split_line)

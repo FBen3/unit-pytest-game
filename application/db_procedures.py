@@ -3,17 +3,11 @@ import psycopg2
 from application.config import db_conn_params
 
 
-
-
-
-
-def bid_check(bidder, item, amount):
+def bid_check(bidder, bid_time, item, amount):
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT
-                    a.item,
-                    a.reserve_price,
                     a.closing_time,
                     a.status,
                     MAX(b.amount) AS highest_bid_by_user
@@ -24,25 +18,26 @@ def bid_check(bidder, item, amount):
                 WHERE
                     a.item = %s
                 GROUP BY
-                    a.item, a.reserve_price, a.closing_time, a.status;
-            """, (bidder, item, amount))
+                    a.reserve_price, a.closing_time, a.status;
+            """, (bidder, item))
 
-            stats = cur.fetchone()
-            print(stats)
+            closing_time, status, highest_bid  = cur.fetchone()
 
+    if status == "UNSOLD" and int(bid_time) < closing_time:
+        if highest_bid and highest_bid < amount:
+            return False
+        return True # accept any initial amount
 
     return False
 
-def process_bidding(bid_time, bidder, item, amount):
-    ###### perform "bid check" : larger than any previous valid bid submitted by that person;  make sure amount is greater than reserve_price
-
-    if bid_check(bidder, item, amount):
+def process_bidding(bid_time, bidder, item, bid_amount):
+    if bid_check(bidder, bid_time, item, bid_amount):
         with psycopg2.connect(**db_conn_params) as conn:
             with conn.cursor() as cur:
                 cur.execute("""
                        INSERT INTO bids (item, amount, bid_time, bidder) 
                        VALUES (%s, %s, %s, %s);
-                   """, (item, amount, bid_time, bidder))
+                   """, (item, bid_amount, bid_time, bidder))
     else:
         raise PermissionError("Bid does not meet requirements")
 
