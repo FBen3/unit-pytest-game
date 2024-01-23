@@ -9,7 +9,7 @@
 
 Assumptions:
 
-- All source code, including tests are located inside 
+- All source code, including tests are located inside project directory
 - `Python 3.10` was used during development & testing
 - Testing framework: `Pytest`
 - Program expects a user supplied path to an input file
