@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import psycopg2
 
 from application.config import db_conn_params
@@ -24,22 +26,20 @@ def bid_check(bidder, bid_time, item, amount):
             closing_time, status, highest_bid  = cur.fetchone()
 
     if status == "UNSOLD" and int(bid_time) < closing_time:
-        if highest_bid and highest_bid < amount:
+        if highest_bid and Decimal(amount) < highest_bid:
             return False
         return True # accept any initial amount
 
     return False
 
 def process_bidding(bid_time, bidder, item, bid_amount):
-    if bid_check(bidder, bid_time, item, bid_amount):
+    if bid_check(bidder, bid_time, item, bid_amount): # invalid bids are not recorded
         with psycopg2.connect(**db_conn_params) as conn:
             with conn.cursor() as cur:
                 cur.execute("""
                        INSERT INTO bids (item, amount, bid_time, bidder) 
                        VALUES (%s, %s, %s, %s);
                    """, (item, bid_amount, bid_time, bidder))
-    else:
-        raise PermissionError("Bid does not meet requirements")
 
 def process_listing(opening_time, seller, item, reserve_price, closing_time):
     ##### catch error in test: psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "auction_key"
@@ -82,10 +82,8 @@ def initialize_tables(save_database: bool):
     print("Initiating database setup:")
     if not save_database:
         try:
-            # connect to database (open & close connections automatically)
-            with psycopg2.connect(**db_conn_params) as conn:
-                # manage database resources (cursor object)
-                with conn.cursor() as cur:
+            with psycopg2.connect(**db_conn_params) as conn: # connect to database (open & close connections automatically)
+                with conn.cursor() as cur: # manage database resources (cursor object)
                     cur.execute("""
                         SELECT table_name
                         FROM information_schema.tables
@@ -102,11 +100,11 @@ def initialize_tables(save_database: bool):
                 create_bids_table(conn)
 
         except psycopg2.DatabaseError as e:
-            print(f"An error occured while initializing DB tables: {e}")
+            print(f"An error occurred while initializing DB tables: {e}")
             raise e
 
         except Exception as e:
-            print(f"Some error occured: {e}")
+            print(f"Some error occurred: {e}")
             raise e
     else:
         print(f"\t- Using existing database")
