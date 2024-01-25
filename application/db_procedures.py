@@ -5,6 +5,90 @@ import psycopg2
 from application.config import db_conn_params
 
 
+def all_auction_items():
+    with psycopg2.connect(**db_conn_params) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT item FROM auction")
+            all_auctioned_items = [row[0] for row in cur.fetchall()]
+
+    return all_auctioned_items
+
+
+def calculate_price_paid_for_item():
+    pass
+
+
+def calculate_final_item_stats(item):
+    with psycopg2.connect(**db_conn_params) as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT 
+                    a.item,
+                    a.closing_time,
+                    a.reserve_price,
+                    a.status,
+                    bid_details.max_bidder,
+                    bid_details.max_amount,
+                    bid_stats.min_amount,
+                    bid_stats.total_bid_count
+                FROM 
+                    auction a
+                JOIN (
+                    SELECT 
+                        b1.item,
+                        b1.bidder as max_bidder,
+                        b1.amount as max_amount
+                    FROM 
+                        bids b1
+                    JOIN (
+                        SELECT 
+                            item, 
+                            MAX(amount) as max_amount
+                        FROM 
+                            bids
+                        WHERE 
+                            item = 'toaster_1'
+                        GROUP BY 
+                            item
+                    ) max_bids ON b1.item = max_bids.item AND b1.amount = max_bids.max_amount
+                    WHERE 
+                        b1.item = 'toaster_1'
+                    ORDER BY 
+                        b1.bid_time ASC
+                    LIMIT 1
+                ) bid_details ON a.item = bid_details.item
+                JOIN (
+                    SELECT 
+                        item,
+                        MIN(amount) as min_amount,
+                        COUNT(id) as total_bid_count
+                    FROM 
+                        bids
+                    WHERE 
+                        item = 'toaster_1'
+                    GROUP BY 
+                        item
+                ) bid_stats ON a.item = bid_stats.item
+                WHERE 
+                    a.item = 'toaster_1';
+            """, item)
+
+            stats = cur.fetchone()
+
+            stats_dict = {
+                "item": stats[0],
+                "bidder": stats[4],
+                "highest_bid": float(stats[5]),
+                "lowest_bid": float(stats[2]),
+                "total_bid_count": stats[7],
+                "reserve_price": stats[6],
+                "closing_time": stats[1],
+                "status": stats[3]
+            }
+
+            return stats_dict
+
+
 def bid_check(bidder, bid_time, item, amount):
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
@@ -32,6 +116,7 @@ def bid_check(bidder, bid_time, item, amount):
 
     return False
 
+
 def process_bidding(bid_time, bidder, item, bid_amount):
     if bid_check(bidder, bid_time, item, bid_amount): # invalid bids are not recorded
         with psycopg2.connect(**db_conn_params) as conn:
@@ -41,6 +126,7 @@ def process_bidding(bid_time, bidder, item, bid_amount):
                        VALUES (%s, %s, %s, %s);
                    """, (item, bid_amount, bid_time, bidder))
 
+
 def process_listing(opening_time, seller, item, reserve_price, closing_time):
     ##### catch error in test: psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "auction_key"
     with psycopg2.connect(**db_conn_params) as conn:
@@ -49,6 +135,7 @@ def process_listing(opening_time, seller, item, reserve_price, closing_time):
                 INSERT INTO auction (item, seller, reserve_price, opening_time, closing_time, status) 
                 VALUES (%s, %s, %s, %s, %s, 'UNSOLD');
             """, (item, seller, reserve_price, opening_time, closing_time))
+
 
 def create_bids_table(connection):
     print("\t- Creating bids table")
@@ -64,6 +151,7 @@ def create_bids_table(connection):
                 FOREIGN KEY (item) REFERENCES auction(item)
             );""")
 
+
 def create_auction_table(connection):
     print("\t- Creating auction table")
 
@@ -77,6 +165,7 @@ def create_auction_table(connection):
                 closing_time    INTEGER                     NOT NULL,
                 status          VARCHAR(6)
             );""")
+
 
 def initialize_tables(save_database: bool):
     print("Initiating database setup:")
