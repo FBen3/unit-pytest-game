@@ -28,7 +28,7 @@ def calculate_price_paid_for_item(highest_bid, second_highest_bid, reserve_price
         return 0
 
     if total_bid_count == 1:
-        return highest_bid
+        return reserve_price
 
     return second_highest_bid
 
@@ -85,7 +85,7 @@ def calculate_final_item_stats(item):
                     GROUP BY 
                         item
                 ) bid_stats ON a.item = bid_stats.item
-                JOIN (
+                LEFT JOIN (
                     SELECT 
                         item,
                         amount AS second_max_amount
@@ -112,7 +112,7 @@ def calculate_final_item_stats(item):
                 "item": stats[0],
                 "bidder": stats[4],
                 "highest_bid": float(stats[5]),
-                "second_highest_bid": float(stats[8]),
+                "second_highest_bid": float(stats[8]) if stats[8] else None,
                 "lowest_bid": float(stats[6]),
                 "total_bid_count": stats[7],
                 "reserve_price": stats[2],
