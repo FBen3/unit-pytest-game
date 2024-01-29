@@ -5,6 +5,12 @@ import psycopg2
 from application.config import db_conn_params
 
 
+def update_status(item):
+    with psycopg2.connect(**db_conn_params) as conn:
+        with conn.cursor() as cur:
+            cur.execute(f"UPDATE auction SET status = 'SOLD' WHERE item = '{item}'")
+
+
 def all_auction_items():
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
@@ -14,8 +20,14 @@ def all_auction_items():
     return all_auctioned_items
 
 
-def calculate_price_paid_for_item():
-    pass
+def calculate_price_paid_for_item(highest_bid, second_highest_bid, reserve_price, total_bid_count, **kwargs):
+    if total_bid_count > 0:
+        if total_bid_count > 1:
+            return second_highest_bid
+        else:
+            return highest_bid if highest_bid > reserve_price else 0
+    else:
+        return 0
 
 
 def calculate_final_item_stats(item):
@@ -30,7 +42,8 @@ def calculate_final_item_stats(item):
                     bid_details.max_bidder,
                     bid_details.max_amount,
                     bid_stats.min_amount,
-                    bid_stats.total_bid_count
+                    bid_stats.total_bid_count,
+                    second_highest_bid.second_max_amount
                 FROM 
                     auction a
                 JOIN (
@@ -47,12 +60,12 @@ def calculate_final_item_stats(item):
                         FROM 
                             bids
                         WHERE 
-                            item = 'toaster_1'
+                            item = %s
                         GROUP BY 
                             item
                     ) max_bids ON b1.item = max_bids.item AND b1.amount = max_bids.max_amount
                     WHERE 
-                        b1.item = 'toaster_1'
+                        b1.item = %s
                     ORDER BY 
                         b1.bid_time ASC
                     LIMIT 1
@@ -65,13 +78,30 @@ def calculate_final_item_stats(item):
                     FROM 
                         bids
                     WHERE 
-                        item = 'toaster_1'
+                        item = %s
                     GROUP BY 
                         item
                 ) bid_stats ON a.item = bid_stats.item
+                JOIN (
+                    SELECT 
+                        item,
+                        amount AS second_max_amount
+                    FROM (
+                        SELECT 
+                            item,
+                            amount,
+                            ROW_NUMBER() OVER (PARTITION BY item ORDER BY amount DESC) as bid_rank
+                        FROM 
+                            bids
+                        WHERE 
+                            item = %s
+                    ) ranked_bids
+                    WHERE 
+                        bid_rank = 2
+                ) second_highest_bid ON a.item = second_highest_bid.item
                 WHERE 
-                    a.item = 'toaster_1';
-            """, item)
+                    a.item = %s;
+            """, (item, item, item, item, item))
 
             stats = cur.fetchone()
 
@@ -79,9 +109,10 @@ def calculate_final_item_stats(item):
                 "item": stats[0],
                 "bidder": stats[4],
                 "highest_bid": float(stats[5]),
-                "lowest_bid": float(stats[2]),
+                "second_highest_bid": float(stats[8]),
+                "lowest_bid": float(stats[6]),
                 "total_bid_count": stats[7],
-                "reserve_price": stats[6],
+                "reserve_price": stats[2],
                 "closing_time": stats[1],
                 "status": stats[3]
             }
