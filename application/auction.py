@@ -8,8 +8,8 @@ class Auction:
 
     def __init__(self, input_path, save_option):
         initialize_tables(save_option)
-        # self.auction_clock = 0
-        # self.start(input_path)
+        self.auction_clock = 0
+        self.start(input_path)
         self.report()
 
     def process_input(self, line: str):
@@ -47,36 +47,32 @@ class Auction:
         else:
             raise FileNotFoundError("Could not find input file")
 
-    def report(self):
+    @staticmethod
+    def report():
         auction_items = all_auction_items()
-        print(auction_items)
 
         for item in auction_items:
             final_stats = calculate_final_item_stats(item)
             price_paid = calculate_price_paid_for_item(**final_stats)
-            # if price_paid > 0:
-            #     final_stats["status"] = "SOLD"
-            #     update_status(item)
-            #
-            # print()
+            result = [
+                str(final_stats["closing_time"]),
+                final_stats["item"],
+            ]
+            if price_paid > 0:
+                final_stats["status"] = "SOLD"
+                # update_status(item) # update database entry
+                result.extend([
+                    str(final_stats["bidder"]),
+                    final_stats["status"],
+                    f"{price_paid:.2f}",
+                ])
+            else:
+                result.extend(["", final_stats["status"], f"{0:.2f}"])
+            result.extend([
+                str(final_stats["total_bid_count"]),
+                f"{final_stats['highest_bid']:.2f}",
+                f"{final_stats['lowest_bid']:.2f}"
+            ])
 
-# {'bidder': 8, 'closing_time': 20, 'highest_bid': 20.0, 'item': 'toaster_1', 'lowest_bid': 10.0, 'reserve_price': 7.50, 'status': 'UNSOLD', 'total_bid_count': 3}
-
-        # return the earliest highest bid highest (for each item) -
-        # item [ok]
-        # bidder [ok]
-        # highest_bid [ok]
-        # lowest_bid [ok]
-        # total_bid_count [ok]
-        # reserved_price [ok]
-        # closing_time [ok]
-        # status [ok]
-
-        # price paid
-
-        pass
-
-
-    # 20|toaster_1|8|SOLD|12.50|3|20.00|7.50
-    # 20|tv_1||UNSOLD|0.00|2|200.00|150.00
-
+            output = "|".join(result)
+            print(output)
