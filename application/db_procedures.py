@@ -21,13 +21,16 @@ def all_auction_items():
 
 
 def calculate_price_paid_for_item(highest_bid, second_highest_bid, reserve_price, total_bid_count, **kwargs):
-    if total_bid_count > 0:
-        if total_bid_count > 1:
-            return second_highest_bid
-        else:
-            return highest_bid if highest_bid > reserve_price else 0
-    else:
+    if total_bid_count == 0:
         return 0
+
+    if highest_bid < reserve_price:
+        return 0
+
+    if total_bid_count == 1:
+        return highest_bid
+
+    return second_highest_bid
 
 
 def calculate_final_item_stats(item):
