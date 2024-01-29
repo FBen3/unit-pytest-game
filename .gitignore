@@ -11,6 +11,6 @@ __pycache__/
 config.ini
 
 # personal
-my_test.txt
+my_test*.txt
 my_notes.txt
 my_plan.txt
