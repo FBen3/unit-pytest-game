@@ -49,30 +49,26 @@ class Auction:
 
     @staticmethod
     def report():
-        auction_items = all_auction_items()
+        auction_items = all_unsold_items()
 
         for item in auction_items:
-            final_stats = calculate_final_item_stats(item)
-            price_paid = calculate_price_paid_for_item(**final_stats)
+            stats = calculate_final_item_stats(item)
+            price_paid = calculate_price_paid_for_item(**stats)
+            status = "SOLD" if price_paid > 0 else "UNSOLD"
+
+            if status == "SOLD":
+                update_status(item) # update database entry
+
             result = [
-                str(final_stats["closing_time"]),
-                final_stats["item"],
+                str(stats["closing_time"]),
+                stats["item"],
+                str(stats["bidder"]) if price_paid > 0 else "",
+                status,
+                f"{price_paid:.2f}",
+                str(stats["total_bid_count"]),
+                f"{stats['highest_bid']:.2f}",
+                f"{stats['lowest_bid']:.2f}"
             ]
-            if price_paid > 0:
-                final_stats["status"] = "SOLD"
-                # update_status(item) # update database entry
-                result.extend([
-                    str(final_stats["bidder"]),
-                    final_stats["status"],
-                    f"{price_paid:.2f}",
-                ])
-            else:
-                result.extend(["", final_stats["status"], f"{0:.2f}"])
-            result.extend([
-                str(final_stats["total_bid_count"]),
-                f"{final_stats['highest_bid']:.2f}",
-                f"{final_stats['lowest_bid']:.2f}"
-            ])
 
             output = "|".join(result)
             print(output)

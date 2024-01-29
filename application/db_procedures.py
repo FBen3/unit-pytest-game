@@ -11,10 +11,10 @@ def update_status(item):
             cur.execute(f"UPDATE auction SET status = 'SOLD' WHERE item = '{item}'")
 
 
-def all_auction_items():
+def all_unsold_items():
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT item FROM auction")
+            cur.execute("SELECT item FROM auction WHERE status = 'UNSOLD'")
             all_auctioned_items = [row[0] for row in cur.fetchall()]
 
     return all_auctioned_items
@@ -124,6 +124,7 @@ def calculate_final_item_stats(item):
 
 
 def bid_check(bidder, bid_time, item, amount):
+    ##### catch error in test: if closing_time is after clock time
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
             cur.execute("""
