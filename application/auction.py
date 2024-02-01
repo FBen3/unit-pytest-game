@@ -6,7 +6,7 @@ from application.db_procedures import *
 class Auction:
 
 
-    def __init__(self, input_path, save_option):
+    def __init__(self, input_path: str, save_option: bool):
         initialize_tables(save_option)
         self.auction_clock = 0
         self.start(input_path)
@@ -39,7 +39,7 @@ class Auction:
             else:
                 raise ValueError("Could not find input action")
 
-    def start(self, input_path):
+    def start(self, input_path: str):
         if os.path.isfile(input_path):
             file_name = os.path.basename(input_path)
             _, extension = file_name.split(".")

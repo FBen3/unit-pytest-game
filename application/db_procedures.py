@@ -1,17 +1,18 @@
 from decimal import Decimal
 
 import psycopg2
+from psycopg2.extensions import connection as Connection
 
 from application.config import db_conn_params
 
 
-def update_status(item):
+def update_status(item: str):
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
             cur.execute("UPDATE auction SET status = 'SOLD' WHERE item = %s", (item,))
 
 
-def all_unexpired_items(time):
+def all_unexpired_items(time: int):
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT item FROM auction WHERE status = 'UNSOLD' AND closing_time <= %s", (time,))
@@ -20,7 +21,12 @@ def all_unexpired_items(time):
     return all_auctioned_items
 
 
-def calculate_price_paid_for_item(highest_bid, second_highest_bid, reserve_price, total_bid_count, **kwargs):
+def calculate_price_paid_for_item(
+        highest_bid: float,
+        second_highest_bid: float,
+        reserve_price: float,
+        total_bid_count: int, **kwargs):
+
     if total_bid_count == 0:
         return 0
 
@@ -33,7 +39,7 @@ def calculate_price_paid_for_item(highest_bid, second_highest_bid, reserve_price
     return second_highest_bid
 
 
-def calculate_final_item_stats(item):
+def calculate_final_item_stats(item: str):
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -115,7 +121,7 @@ def calculate_final_item_stats(item):
                 "second_highest_bid": float(stats[8]) if stats[8] else None,
                 "lowest_bid": float(stats[6]),
                 "total_bid_count": stats[7],
-                "reserve_price": stats[2],
+                "reserve_price": float(stats[2]),
                 "closing_time": stats[1],
                 "status": stats[3]
             }
@@ -123,7 +129,7 @@ def calculate_final_item_stats(item):
             return stats_dict
 
 
-def bid_check(bidder, bid_time, item, amount):
+def bid_check(bidder: str, bid_time: str, item: str, amount: str):
     ##### catch error in test: if closing_time is after clock time
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
@@ -152,17 +158,17 @@ def bid_check(bidder, bid_time, item, amount):
     return False
 
 
-def process_bidding(bid_time, bidder, item, bid_amount):
+def process_bidding(bid_time: str, bidder: str, item: str, bid_amount: str):
     if bid_check(bidder, bid_time, item, bid_amount): # invalid bids are not recorded
         with psycopg2.connect(**db_conn_params) as conn:
             with conn.cursor() as cur:
                 cur.execute("""
                        INSERT INTO bids (item, amount, bid_time, bidder) 
                        VALUES (%s, %s, %s, %s);
-                   """, (item, bid_amount, bid_time, bidder))
+                   """, (item, bid_amount, bid_time, bidder)) # will handle data conversion automatically
 
 
-def process_listing(opening_time, seller, item, reserve_price, closing_time):
+def process_listing(opening_time: str, seller: str, item: str, reserve_price: str, closing_time: str):
     ##### catch error in test: psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "auction_key"
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
@@ -172,7 +178,7 @@ def process_listing(opening_time, seller, item, reserve_price, closing_time):
             """, (item, seller, reserve_price, opening_time, closing_time))
 
 
-def create_bids_table(connection):
+def create_bids_table(connection: Connection):
     print("\t- Creating bids table")
 
     with connection.cursor() as cur:
@@ -187,7 +193,7 @@ def create_bids_table(connection):
             );""")
 
 
-def create_auction_table(connection):
+def create_auction_table(connection: Connection):
     print("\t- Creating auction table")
 
     with connection.cursor() as cur:
