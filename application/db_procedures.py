@@ -9,24 +9,25 @@ from application.config import db_conn_params
 def update_status(item: str):
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
-            cur.execute("UPDATE auction SET status = 'SOLD' WHERE item = %s", (item,))
+            cur.execute("UPDATE auction SET status = 'SOLD' WHERE item = %s", (item,))  # fmt: skip
 
 
 def all_unexpired_items(time: int):
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT item FROM auction WHERE status = 'UNSOLD' AND closing_time <= %s", (time,))
+            cur.execute("SELECT item FROM auction WHERE status = 'UNSOLD' AND closing_time <= %s", (time,))  # fmt: skip
             all_auctioned_items = [row[0] for row in cur.fetchall()]
 
     return all_auctioned_items
 
 
 def calculate_price_paid_for_item(
-        highest_bid: float,
-        second_highest_bid: float,
-        reserve_price: float,
-        total_bid_count: int, **kwargs):
-
+    highest_bid: float,
+    second_highest_bid: float,
+    reserve_price: float,
+    total_bid_count: int,
+    **kwargs,
+):
     if total_bid_count == 0:
         return 0
 
@@ -42,7 +43,8 @@ def calculate_price_paid_for_item(
 def calculate_final_item_stats(item: str):
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT 
                     a.item,
                     a.closing_time,
@@ -110,7 +112,8 @@ def calculate_final_item_stats(item: str):
                 ) second_highest_bid ON a.item = second_highest_bid.item
                 WHERE 
                     a.item = %s;
-            """, (item, item, item, item, item))
+            """, (item, item, item, item, item)  # fmt: skip
+            )
 
             stats = cur.fetchone()
 
@@ -123,7 +126,7 @@ def calculate_final_item_stats(item: str):
                 "total_bid_count": stats[7],
                 "reserve_price": float(stats[2]),
                 "closing_time": stats[1],
-                "status": stats[3]
+                "status": stats[3],
             }
 
             return stats_dict
@@ -133,7 +136,8 @@ def bid_check(bidder: str, bid_time: str, item: str, amount: str):
     ##### catch error in test: if closing_time is after clock time
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT
                     a.closing_time,
                     a.status,
@@ -146,43 +150,57 @@ def bid_check(bidder: str, bid_time: str, item: str, amount: str):
                     a.item = %s
                 GROUP BY
                     a.reserve_price, a.closing_time, a.status;
-            """, (bidder, item))
+            """, (bidder, item)  # fmt: skip
+            )
 
-            closing_time, status, highest_bid  = cur.fetchone()
+            closing_time, status, highest_bid = cur.fetchone()
 
     if status == "UNSOLD" and int(bid_time) < closing_time:
         if highest_bid and Decimal(amount) < highest_bid:
             return False
-        return True # accept any initial amount
+        return True  # accept any initial amount
 
     return False
 
 
 def process_bidding(bid_time: str, bidder: str, item: str, bid_amount: str):
-    if bid_check(bidder, bid_time, item, bid_amount): # invalid bids are not recorded
+    if bid_check(
+        bidder, bid_time, item, bid_amount
+    ):  # invalid bids are not recorded
         with psycopg2.connect(**db_conn_params) as conn:
             with conn.cursor() as cur:
-                cur.execute("""
+                cur.execute(
+                    """
                        INSERT INTO bids (item, amount, bid_time, bidder) 
                        VALUES (%s, %s, %s, %s);
-                   """, (item, bid_amount, bid_time, bidder)) # will handle data conversion automatically
+                """, (item, bid_amount, bid_time, bidder)  # fmt: skip
+                )  # will handle data conversion automatically
 
 
-def process_listing(opening_time: str, seller: str, item: str, reserve_price: str, closing_time: str):
+def process_listing(
+    opening_time: str,
+    seller: str,
+    item: str,
+    reserve_price: str,
+    closing_time: str,
+):
     ##### catch error in test: psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "auction_key"
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO auction (item, seller, reserve_price, opening_time, closing_time, status) 
                 VALUES (%s, %s, %s, %s, %s, 'UNSOLD');
-            """, (item, seller, reserve_price, opening_time, closing_time))
+            """, (item, seller, reserve_price, opening_time, closing_time)  # fmt: skip
+            )
 
 
 def create_bids_table(connection: Connection):
     print("\t- Creating bids table")
 
     with connection.cursor() as cur:
-        cur.execute("""
+        cur.execute(
+            """
             CREATE TABLE bids (
                 id          SERIAL          PRIMARY KEY,
                 item        VARCHAR(30)     NOT NULL,
@@ -190,14 +208,16 @@ def create_bids_table(connection: Connection):
                 bid_time    INTEGER         NOT NULL,
                 bidder      INTEGER         NOT NULL,
                 FOREIGN KEY (item) REFERENCES auction(item)
-            );""")
+            );"""
+        )
 
 
 def create_auction_table(connection: Connection):
     print("\t- Creating auction table")
 
     with connection.cursor() as cur:
-        cur.execute("""
+        cur.execute(
+            """
             CREATE TABLE auction (
                 item            VARCHAR(30)     PRIMARY KEY NOT NULL,
                 seller          INTEGER                     NOT NULL,
@@ -205,19 +225,23 @@ def create_auction_table(connection: Connection):
                 opening_time    INTEGER                     NOT NULL,
                 closing_time    INTEGER                     NOT NULL,
                 status          VARCHAR(6)
-            );""")
+            );"""
+        )
 
 
 def initialize_tables(save_database: bool):
     print("Initiating database setup:")
     if not save_database:
         try:
-            with psycopg2.connect(**db_conn_params) as conn: # connect to database (open & close connections automatically)
-                with conn.cursor() as cur: # manage database resources (cursor object)
+            # fmt: off
+            with psycopg2.connect(**db_conn_params) as conn:  # connect to database (open & close connections automatically)
+                with conn.cursor() as cur:  # manage database resources (cursor object)
+                    # fmt: on
                     cur.execute("""
                         SELECT table_name
                         FROM information_schema.tables
-                        WHERE table_schema = 'public'""")
+                        WHERE table_schema = 'public'"""
+                    )
                     tables = cur.fetchall()
 
                     if tables:

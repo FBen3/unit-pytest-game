@@ -4,8 +4,6 @@ from application.db_procedures import *
 
 
 class Auction:
-
-
     def __init__(self, input_path: str, save_option: bool):
         initialize_tables(save_option)
         self.auction_clock = 0
@@ -21,7 +19,7 @@ class Auction:
         else:
             self.auction_clock = time
 
-        if len(split_line) > 1: # do not process heartbeat messages
+        if len(split_line) > 1:  # do not process heartbeat messages
             if split_line[2] == "SELL":
                 del split_line[2]
                 try:
@@ -61,7 +59,7 @@ class Auction:
             status = "SOLD" if price_paid > 0 else "UNSOLD"
 
             if status == "SOLD":
-                update_status(item) # update database entry
+                update_status(item)  # update database entry
 
             result = [
                 str(stats["closing_time"]),
@@ -71,7 +69,7 @@ class Auction:
                 f"{price_paid:.2f}",
                 str(stats["total_bid_count"]),
                 f"{stats['highest_bid']:.2f}",
-                f"{stats['lowest_bid']:.2f}"
+                f"{stats['lowest_bid']:.2f}",
             ]
 
             output = "|".join(result)
