@@ -14,7 +14,7 @@ def update_status(item):
 def all_unexpired_items(time):
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT item FROM auction WHERE status = 'UNSOLD' AND closing_time > %s", (time,))
+            cur.execute("SELECT item FROM auction WHERE status = 'UNSOLD' AND closing_time <= %s", (time,))
             all_auctioned_items = [row[0] for row in cur.fetchall()]
 
     return all_auctioned_items
