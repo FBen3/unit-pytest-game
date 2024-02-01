@@ -14,7 +14,12 @@ class Auction:
 
     def process_input(self, line: str):
         split_line = line.split("|")
-        self.auction_clock = split_line[0]
+        time = int(split_line[0])
+
+        if time < self.auction_clock:
+            raise RuntimeError("Non-chronological input")
+        else:
+            self.auction_clock = time
 
         if len(split_line) > 1: # do not process heartbeat messages
             if split_line[2] == "SELL":
@@ -47,9 +52,8 @@ class Auction:
         else:
             raise FileNotFoundError("Could not find input file")
 
-    @staticmethod
-    def report():
-        auction_items = all_unsold_items()
+    def report(self):
+        auction_items = all_unexpired_items(self.auction_clock)
 
         for item in auction_items:
             stats = calculate_final_item_stats(item)

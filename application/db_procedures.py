@@ -8,13 +8,13 @@ from application.config import db_conn_params
 def update_status(item):
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
-            cur.execute(f"UPDATE auction SET status = 'SOLD' WHERE item = '{item}'")
+            cur.execute("UPDATE auction SET status = 'SOLD' WHERE item = %s", (item,))
 
 
-def all_unsold_items():
+def all_unexpired_items(time):
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT item FROM auction WHERE status = 'UNSOLD'")
+            cur.execute("SELECT item FROM auction WHERE status = 'UNSOLD' AND closing_time > %s", (time,))
             all_auctioned_items = [row[0] for row in cur.fetchall()]
 
     return all_auctioned_items
