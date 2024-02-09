@@ -9,6 +9,8 @@ if __name__ == "__main__":
     parser.add_argument("--save", "-s", action="store_true")
     args = parser.parse_args()
 
-    Auction(args.path, args.save)
+    auction = Auction(args.save)
+    auction.run(args.path)
+    auction.report()
 
     print("\nUnitPytestGame")

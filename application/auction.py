@@ -4,11 +4,9 @@ from application.db_procedures import *
 
 
 class Auction:
-    def __init__(self, input_path: str, save_option: bool):
+    def __init__(self, save_option: bool):
         initialize_tables(save_option)
         self.auction_clock = 0
-        self.start(input_path)
-        self.report()
 
     def process_input(self, line: str):
         split_line = line.split("|")
@@ -37,7 +35,7 @@ class Auction:
             else:
                 raise ValueError("Could not find input action")
 
-    def start(self, input_path: str):
+    def run(self, input_path: str):
         if os.path.isfile(input_path):
             file_name = os.path.basename(input_path)
             _, extension = file_name.split(".")
