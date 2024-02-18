@@ -26,30 +26,22 @@ def test_SOLD_item(monkeypatch, capsys, successful_bid_example):
     assert expected_output in captured_output.out
 
 
+def test_UNSOLD_item(monkeypatch, capsys, unsuccessful_bid_example):
+    monkeypatch.setattr(
+        'application.auction.all_unexpired_items',
+        lambda x: ['tv_1']
+    )
 
+    monkeypatch.setattr(
+        'application.auction.calculate_final_item_stats',
+        lambda x: unsuccessful_bid_example
+    )
 
+    auction = Auction(save_option=False)
+    auction.report()
 
+    captured_output = capsys.readouterr()
 
-# def test_UNSOLD_item():
-#     pass
+    expected_output = "20|tv_1||UNSOLD|0.00|2|200.00|150.00"
 
-# def_multiple_SOLD_items():
-#   pass
-
-# def_SOLD_and_UNSOLD_items():
-#   pass
-
-
-
-
-# test shit with cont feature
-
-
-
-
-
-
-
-
-
-
+    assert expected_output in captured_output.out
