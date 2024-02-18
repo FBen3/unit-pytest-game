@@ -50,7 +50,7 @@ class Auction:
 
     def report(self):
         auction_items = all_unexpired_items(self.auction_clock)
-
+        # ['toaster_1', 'tv_1']
         for item in auction_items:
             stats = calculate_final_item_stats(item)
             price_paid = calculate_price_paid_for_item(**stats)
