@@ -57,7 +57,7 @@ class Auction:
             status = "SOLD" if price_paid > 0 else "UNSOLD"
 
             if status == "SOLD":
-                update_status(item)  # update dabase entry
+                update_status(item)  # update database entry
 
             result = [
                 str(stats["closing_time"]),
