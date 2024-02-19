@@ -19,11 +19,11 @@ def test_SOLD_item(monkeypatch, capsys, successful_bid_example):
     auction = Auction(save_option=False)
     auction.report()
 
-    captured_output = capsys.readouterr()
+    captured_output, err = capsys.readouterr()
 
     expected_output = "20|toaster_1|8|SOLD|12.50|3|20.00|7.50"
 
-    assert expected_output in captured_output.out
+    assert expected_output in captured_output
 
 
 def test_UNSOLD_item(monkeypatch, capsys, unsuccessful_bid_example):
@@ -40,8 +40,8 @@ def test_UNSOLD_item(monkeypatch, capsys, unsuccessful_bid_example):
     auction = Auction(save_option=False)
     auction.report()
 
-    captured_output = capsys.readouterr()
+    captured_output, err = capsys.readouterr()
 
     expected_output = "20|tv_1||UNSOLD|0.00|2|200.00|150.00"
 
-    assert expected_output in captured_output.out
+    assert expected_output in captured_output
