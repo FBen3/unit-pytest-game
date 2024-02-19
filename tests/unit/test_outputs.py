@@ -4,6 +4,13 @@ from application.auction import Auction
 
 
 def test_SOLD_item(monkeypatch, capsys, successful_bid_example):
+    # mock initialize_tables to prohibit creating db tables
+    monkeypatch.setattr(
+        'application.auction.initialize_tables',
+        lambda save_option: False
+    )
+
+
     # mock all_unexpected_items to return an item list containing 'toaster_1'
     monkeypatch.setattr(
         'application.auction.all_unexpired_items',
@@ -27,6 +34,11 @@ def test_SOLD_item(monkeypatch, capsys, successful_bid_example):
 
 
 def test_UNSOLD_item(monkeypatch, capsys, unsuccessful_bid_example):
+    monkeypatch.setattr(
+        'application.auction.initialize_tables',
+        lambda save_option: False
+    )
+
     monkeypatch.setattr(
         'application.auction.all_unexpired_items',
         lambda x: ['tv_1']
