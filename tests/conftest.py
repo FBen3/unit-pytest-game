@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 
@@ -29,6 +31,15 @@ def unsuccessful_bid_example():
         'status': 'UNSOLD',
         'total_bid_count': 2
     }
+
+
+@pytest.fixture(scope="function")
+def default_auction():
+    default_path = os.path.join(
+        os.path.dirname(__file__), "fixtures", "default_input.txt"
+    )
+
+    return default_path
 
 
 

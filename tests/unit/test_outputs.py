@@ -7,7 +7,7 @@ def test_SOLD_item(monkeypatch, capsys, successful_bid_example):
     # mock initialize_tables to prohibit creating db tables
     monkeypatch.setattr(
         'application.auction.initialize_tables',
-        lambda save_option: False
+        lambda x: None
     )
 
 
@@ -23,6 +23,12 @@ def test_SOLD_item(monkeypatch, capsys, successful_bid_example):
         lambda x: successful_bid_example
     )
 
+    # mock update_status to prohibit updating the db
+    monkeypatch.setattr(
+        'application.auction.update_status',
+        lambda x: None
+    )
+
     auction = Auction(save_option=False)
     auction.report()
 
@@ -36,7 +42,7 @@ def test_SOLD_item(monkeypatch, capsys, successful_bid_example):
 def test_UNSOLD_item(monkeypatch, capsys, unsuccessful_bid_example):
     monkeypatch.setattr(
         'application.auction.initialize_tables',
-        lambda save_option: False
+        lambda x: None
     )
 
     monkeypatch.setattr(
