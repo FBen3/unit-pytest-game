@@ -42,5 +42,14 @@ def default_auction():
     return default_path
 
 
+@pytest.fixture(scope="function")
+def incorrect_auction_time():
+    bad_time_path = os.path.join(
+        os.path.dirname(__file__), "fixtures", "incorrect_time.txt"
+    )
+
+    return bad_time_path
+
+
 
 

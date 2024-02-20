@@ -1,0 +1,2 @@
+10|1|SELL|toaster_1|10.00|20
+9|8|BID|toaster_1|7.50

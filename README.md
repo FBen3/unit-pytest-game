@@ -25,7 +25,7 @@ Quickstart:
 
 Observations:
 
-- it's possible for an item to close while another is being listed or bet on
-- future feature is maybe to be able to read multiple files concurrently
+- # buggy line in auction | incorrect content [comment on this]
+- read multiple files and have multiple auctions going
 
 
