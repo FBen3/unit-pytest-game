@@ -3,7 +3,7 @@ import os
 import pytest
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def successful_bid_example():
     return {
         'bidder': 8,
@@ -18,7 +18,7 @@ def successful_bid_example():
     }
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def unsuccessful_bid_example():
     return {
         'bidder': 3,
@@ -33,7 +33,7 @@ def unsuccessful_bid_example():
     }
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def default_auction():
     default_path = os.path.join(
         os.path.dirname(__file__), "fixtures", "default_input.txt"
@@ -42,7 +42,7 @@ def default_auction():
     return default_path
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def incorrect_auction_time():
     bad_time_path = os.path.join(
         os.path.dirname(__file__), "fixtures", "incorrect_time.txt"
