@@ -51,5 +51,11 @@ def incorrect_auction_time():
     return bad_time_path
 
 
-
-
+# you can define and use this mock as a
+# function argument wherever necessary
+# @pytest.fixture(scope="function")
+# def mock_initialize_tables(monkeypatch):
+#     monkeypatch.setattr(
+#         'application.auction.initialize_tables',
+#         lambda x: None
+#     )
