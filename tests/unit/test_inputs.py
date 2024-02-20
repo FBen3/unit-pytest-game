@@ -5,7 +5,7 @@ import pytest
 from application.auction import Auction
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True)  # automatically apply to all tests
 def mock_initialize_tables(monkeypatch):
     monkeypatch.setattr('application.auction.initialize_tables', lambda x: None)
 
