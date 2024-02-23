@@ -1,6 +1,6 @@
 import pytest
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, call
 
 from application.db_procedures import *
 
@@ -9,7 +9,7 @@ def test_initialize_tables():
     with (patch('application.db_procedures.psycopg2.connect') as mock_conn):
         mock_cur = MagicMock()
         mock_cur.__enter__.return_value.fetchall.return_value = []  # mock empty database
-        mock_conn.return_value.__enter__.return_value.cursor.return_value = mock_cur  # mock connection to empty use empty database
+        mock_conn.return_value.__enter__.return_value.cursor.return_value = mock_cur  # mock connection to use empty database
 
         with patch('application.db_procedures.create_auction_table') as mock_create_auction_table, \
             patch('application.db_procedures.create_bids_table') as mock_create_bids_table:
@@ -26,46 +26,41 @@ def test_initialize_tables():
             mock_create_bids_table.assert_called_once()
 
 
+def test_initialize_tables_clean_db(capsys):
+    with (patch('application.db_procedures.psycopg2.connect') as mock_conn):
+        mock_cur = MagicMock()
+        mock_cur.__enter__.return_value.fetchall.return_value = [("auction",), ("bids",)]
+        mock_conn.return_value.__enter__.return_value.cursor.return_value = mock_cur
 
+        with patch('application.db_procedures.create_auction_table') as mock_create_auction_table, \
+            patch('application.db_procedures.create_bids_table') as mock_create_bids_table:
+            initialize_tables(save_database=False)
 
+            sql_drop_calls = [
+                call("DROP TABLE auction CASCADE;"),
+                call("DROP TABLE bids CASCADE;")
+            ]
+            mock_cur.__enter__.return_value.execute.assert_has_calls(calls=sql_drop_calls, any_order=True)  # simulate & assert the order of SQL calls
 
+            mock_create_auction_table.assert_called_once()  # note & remember that because this function is patched (above, in the `with`), it doesn't actually execute; `assert_called_once()` only asserts whether it would be called
+            mock_create_bids_table.assert_called_once()  # asserts call but doesn't actually execute
 
-# save_database=False, no tables are fetched, create_auction_table() & create_bids_table() executes; no errors are thrown [OK]
-# save_database=False, tables are found, check print() statement, assert&mock execute DROP table, create_auction_table() & create_bids_table() executes; no errors are thrown
+            captured_output, err = capsys.readouterr()
 
+            expected_output_lines = [
+                "Initiating database setup:",
+                "\t- Found existing tables",
+                "\t- Deleted tables: [('auction',), ('bids',)]",
+            ]
+            ##################################
+            # While it's okay you wanted to test & see outputs here, this is more of an integration thing.
+            # If you did wanted to test the print() statements in create_auction_table() and mock_create_bids_table() you would have to use side_effect().
+            # However, especially in unit tests, focus on behavior & outcomes, over results (end-to-end output).
+            # Typically, unit tests should focus more on the behavior and outcomes of your functions rather than their internal implementation details, such as whether they print specific messages. Verifying that create_auction_table() and create_bids_table() are called is usually sufficient for unit testing purposes. If you specifically need to test the output of these functions, consider integration tests that run the actual functions rather than mocking them, in an environment where side effects (like database modifications) are controlled or isolated.
+            # In summary, for your current unit test setup, focusing on whether create_auction_table() and create_bids_table() are called is typically sufficient, and it's common for the actual body of mocked functions NOT to execute here.
+            ##################################
 
-
-# def test_get_all_items(mock_db_response):
-#     with patch('application.db_procedures.psycopg2.connect') as mock_connect:
-#         mock_cursor = mock_connect.return_value.cursor.return_value
-#         mock_cursor.fetchall.return_value = mock_db_response
-#
-#         result = get_all_items()
-#
-#         assert result == mock_db_response
-#
-# def test_insert_item():
-#     with patch('application.db_procedures.psycopg2.connect') as mock_connect:
-#         mock_cursor = mock_connect.return_value.cursor.return_value
-#
-#         # Assume insert_item() is the function to test
-#         insert_item('Item 3', 'Description of item 3')
-#
-#       --------
-#         mock_cursor.execute.assert_called_with(
-#             "INSERT INTO items (name, description) VALUES (%s, %s)",
-#             ('Item 3', 'Description of item 3')
-#         )
-#       --------
-
-
-
-
-
-
-
-
-
-
+            for line in expected_output_lines:
+                assert line in captured_output
 
 

@@ -59,3 +59,6 @@ def incorrect_auction_time():
 #         'application.auction.initialize_tables',
 #         lambda x: None
 #     )
+
+
+
