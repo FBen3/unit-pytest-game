@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock, call
 from application.db_procedures import *
 
 
-def test_initialize_tables():
+def test_initialize_tables_empty_db():
     with (patch('application.db_procedures.psycopg2.connect') as mock_conn):
         mock_cur = MagicMock()
         mock_cur.__enter__.return_value.fetchall.return_value = []  # mock empty database
@@ -26,7 +26,7 @@ def test_initialize_tables():
             mock_create_bids_table.assert_called_once()
 
 
-def test_initialize_tables_clean_db(capsys):
+def test_initialize_tables_occupied_db(capsys):
     with (patch('application.db_procedures.psycopg2.connect') as mock_conn):
         mock_cur = MagicMock()
         mock_cur.__enter__.return_value.fetchall.return_value = [("auction",), ("bids",)]
