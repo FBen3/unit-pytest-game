@@ -17,12 +17,12 @@ def test_initialize_tables():
             mock_cur.__enter__.return_value.execute.assert_called_with("""
                         SELECT table_name
                         FROM information_schema.tables
-                        WHERE table_schema = 'public'""")
+                        WHERE table_schema = 'public'""")  # checks that the LAST call was made with these arguments
 
             mock_conn.return_value.__enter__.return_value.cursor.return_value = mock_cur
 
 
-            mock_create_auction_table.assert_called_once()
+            mock_create_auction_table.assert_called_once()  # checks that the func was called exactly once, (doesn't verify the arguments, only the call count)
             mock_create_bids_table.assert_called_once()
 
 
@@ -64,3 +64,30 @@ def test_initialize_tables_clean_db(capsys):
                 assert line in captured_output
 
 
+def test_create_auction_table():
+    mock_conn = MagicMock()
+    create_auction_table(mock_conn)
+
+    mock_conn.cursor.return_value.__enter__.return_value.execute.assert_called_once_with("""
+            CREATE TABLE auction (
+                item            VARCHAR(30)     PRIMARY KEY NOT NULL,
+                seller          INTEGER                     NOT NULL,
+                reserve_price   NUMERIC(5, 2)               NOT NULL,
+                opening_time    INTEGER                     NOT NULL,
+                closing_time    INTEGER                     NOT NULL,
+                status          VARCHAR(6)
+            );""")  # checks that the mock was called exactly once, and with the specified arguments
+
+
+def test_process_listing(monkeypatch):
+    auction_listing_line = ["10", "1", "toaster_1", "10.00", "20"]
+
+    with patch('application.db_procedures.psycopg2.connect') as mock_conn:
+        process_listing(*auction_listing_line)
+
+        mock_conn.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value.execute.assert_called_once_with(
+                """
+                INSERT INTO auction (item, seller, reserve_price, opening_time, closing_time, status) 
+                VALUES (%s, %s, %s, %s, %s, 'UNSOLD');
+            """, ("toaster_1", "1", "10.00", "10", "20")
+            )
