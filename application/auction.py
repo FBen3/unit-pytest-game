@@ -48,12 +48,31 @@ class Auction:
         else:
             raise FileNotFoundError("Could not find input file")
 
+    @staticmethod
+    def calculate_price_paid_for_item(
+        highest_bid: float,
+        second_highest_bid: float,
+        reserve_price: float,
+        total_bid_count: int,
+        **kwargs,
+    ):
+        if total_bid_count == 0:
+            return 0
+
+        if highest_bid < reserve_price:
+            return 0
+
+        if total_bid_count == 1:
+            return reserve_price
+
+        return second_highest_bid
+
     def report(self):
         auction_items = all_unexpired_items(self.auction_clock)
 
         for item in auction_items:
             stats = calculate_final_item_stats(item)
-            price_paid = calculate_price_paid_for_item(**stats)
+            price_paid = self.calculate_price_paid_for_item(**stats)
             status = "SOLD" if price_paid > 0 else "UNSOLD"
 
             if status == "SOLD":

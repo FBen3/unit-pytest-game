@@ -21,25 +21,6 @@ def all_unexpired_items(time: int):
     return all_auctioned_items
 
 
-def calculate_price_paid_for_item(
-    highest_bid: float,
-    second_highest_bid: float,
-    reserve_price: float,
-    total_bid_count: int,
-    **kwargs,
-):
-    if total_bid_count == 0:
-        return 0
-
-    if highest_bid < reserve_price:
-        return 0
-
-    if total_bid_count == 1:
-        return reserve_price
-
-    return second_highest_bid
-
-
 def calculate_final_item_stats(item: str):
     with psycopg2.connect(**db_conn_params) as conn:
         with conn.cursor() as cur:
