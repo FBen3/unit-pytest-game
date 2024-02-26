@@ -3,7 +3,10 @@ from decimal import Decimal
 import psycopg2
 from psycopg2.extensions import connection as Connection
 
-from application.config import db_conn_params
+from application.config import fetch_database_params
+
+
+db_conn_params = fetch_database_params()
 
 
 def update_status(item: str):
