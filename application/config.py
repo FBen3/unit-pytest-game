@@ -11,7 +11,9 @@ def fetch_database_params(config_path=None):
 
     config = configparser.ConfigParser()
     if not config.read(config_path):
-        raise FileNotFoundError(f"Could not find or read the config.ini file at location: {config_path}")
+        raise FileNotFoundError(
+            f"Could not find or read the config.ini file at location: {config_path}"
+        )
 
     db_conn_params = {
         "dbname": config["database"]["dbname"],
