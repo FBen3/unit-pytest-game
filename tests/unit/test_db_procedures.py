@@ -2,7 +2,7 @@ import pytest
 
 from unittest.mock import patch, MagicMock, call
 
-from application.db_procedures import *
+from application.db_procedures import initialize_tables, create_auction_table, process_listing
 
 
 def test_initialize_tables_empty_db():
