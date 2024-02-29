@@ -213,12 +213,12 @@ def create_auction_table(connection: Connection):
         )
 
 
-def initialize_tables(save_database: bool):
+def initialize_tables(save_database: bool, db_conn=db_conn_params):
     print("Initiating database setup:")
     if not save_database:
         try:
             # fmt: off
-            with psycopg2.connect(**db_conn_params) as conn:  # connect to database (open & close connections automatically)
+            with psycopg2.connect(**db_conn) as conn:  # connect to database (open & close connections automatically)
                 with conn.cursor() as cur:  # manage database resources (cursor object)
                     # fmt: on
                     cur.execute("""
