@@ -24,7 +24,7 @@ def initialize_test_db():
     conn.close()
 
 
-test_db_conn_params = fetch_database_params("../fixtures/test_config.ini")
+test_db_conn_params = fetch_database_params("../fixtures/test_db_config.ini")
 
 def initialize_test_db_tables():
     initialize_tables(save_database=False, db_conn=test_db_conn_params)
