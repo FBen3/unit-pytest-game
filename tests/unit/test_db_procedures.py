@@ -6,7 +6,7 @@ from application.db_procedures import *
 
 
 def test_initialize_tables_empty_db():
-    with (patch('application.db_procedures.psycopg2.connect') as mock_conn):
+    with patch('application.db_procedures.psycopg2.connect') as mock_conn:
         mock_cur = MagicMock()
         mock_cur.__enter__.return_value.fetchall.return_value = []  # mock empty database
         mock_conn.return_value.__enter__.return_value.cursor.return_value = mock_cur  # mock connection to use empty database
@@ -27,7 +27,7 @@ def test_initialize_tables_empty_db():
 
 
 def test_initialize_tables_occupied_db(capsys):
-    with (patch('application.db_procedures.psycopg2.connect') as mock_conn):
+    with patch('application.db_procedures.psycopg2.connect') as mock_conn:
         mock_cur = MagicMock()
         mock_cur.__enter__.return_value.fetchall.return_value = [("auction",), ("bids",)]
         mock_conn.return_value.__enter__.return_value.cursor.return_value = mock_cur
