@@ -18,6 +18,7 @@ def initialize_test_db():
     # by setting autocommit to True before executing any cursor operations, you ensure that commands are executed immediately (as opposed to part of a transaction).
     conn = psycopg2.connect(**admin_db_conn_params)
     conn.autocommit = True
+
     with conn.cursor() as cur:
         cur.execute("DROP DATABASE IF EXISTS test_auction_db")
         cur.execute("CREATE DATABASE test_auction_db")
@@ -36,3 +37,18 @@ def initialize_test_tables():
 
 def init_connection_pool():
     return pool.SimpleConnectionPool(1,10, **test_db_conn_params)
+
+
+def teardown_test_db():
+    conn = psycopg2.connect(**admin_db_conn_params)
+    conn.autocommit = True
+
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT pg_terminate_backend(pid) 
+            FROM pg_stat_activity 
+            WHERE datname='test_auction_db'
+        """)  # forcibly disconnect any users or sessions
+        cur.execute("DROP DATABASE IF EXISTS test_auction_db")
+
+    conn.close()
