@@ -7,7 +7,9 @@ from integration.setup_test_db import *
 
 @pytest.fixture(scope="session")
 def connection_pool(prepare_test_database):
-    return init_connection_pool()
+    conn_pool = init_connection_pool()
+    yield conn_pool
+    conn_pool.closeall()
 
 
 @pytest.fixture(scope="session")
