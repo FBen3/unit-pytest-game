@@ -1,3 +1,5 @@
+import os
+
 import psycopg2
 from psycopg2 import pool
 
@@ -16,7 +18,6 @@ def initialize_test_db():
     # by setting autocommit to True before executing any cursor operations, you ensure that commands are executed immediately (as opposed to part of a transaction).
     conn = psycopg2.connect(**admin_db_conn_params)
     conn.autocommit = True
-
     with conn.cursor() as cur:
         cur.execute("DROP DATABASE IF EXISTS test_auction_db")
         cur.execute("CREATE DATABASE test_auction_db")
@@ -24,7 +25,10 @@ def initialize_test_db():
     conn.close()
 
 
-test_db_conn_params = fetch_database_params("../fixtures/test_db_config.ini")
+current_dir = os.path.abspath(os.path.dirname(__file__))
+root_dir = os.path.dirname(current_dir)
+config_path = os.path.join(root_dir, "fixtures", "test_db_config.ini")
+test_db_conn_params = fetch_database_params(config_path)
 
 def initialize_test_tables():
     initialize_tables(save_database=False, db_conn=test_db_conn_params)
