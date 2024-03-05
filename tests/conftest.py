@@ -5,14 +5,6 @@ import pytest
 from integration.setup_test_db import *
 
 
-@pytest.fixture(scope="session", autouse=True)  # automatically apply to all tests
-def prepare_test_database():
-    initialize_test_db()
-    initialize_test_tables()
-    yield
-    # add tear down logic later
-
-
 @pytest.fixture(scope="session")
 def connection_pool(prepare_test_database):
     return init_connection_pool()
@@ -25,6 +17,14 @@ def db_connections(connection_pool):
     connection_pool.putconn(connection)
 
 
+@pytest.fixture(scope="session", autouse=True)  # automatically apply to all tests
+def prepare_test_database():
+    initialize_test_db()
+    initialize_test_tables()
+    yield
+    teardown_test_db()
+
+
 @pytest.fixture(scope="session")
 def insert_tea_pot_listing(db_connections):
     with db_connections.cursor() as cur:
@@ -35,6 +35,33 @@ def insert_tea_pot_listing(db_connections):
         """)
 
         db_connections.commit()
+
+
+@pytest.fixture(scope="session")
+def default_auction():
+    default_path = os.path.join(
+        os.path.dirname(__file__), "fixtures", "default_input.txt"
+    )
+
+    return default_path
+
+
+@pytest.fixture(scope="session")
+def incorrect_auction_time():
+    bad_time_path = os.path.join(
+        os.path.dirname(__file__), "fixtures", "incorrect_time.txt"
+    )
+
+    return bad_time_path
+
+
+@pytest.fixture(scope="session")
+def tea_pot_bid_check():
+    tea_pot_bids_path = os.path.join(
+        os.path.dirname(__file__), "fixtures", "test_bid_check_1.txt"
+    )
+
+    return tea_pot_bids_path
 
 
 @pytest.fixture(scope="session")
@@ -67,38 +94,10 @@ def unsuccessful_bid_example():
     }
 
 
-@pytest.fixture(scope="session")
-def default_auction():
-    default_path = os.path.join(
-        os.path.dirname(__file__), "fixtures", "default_input.txt"
-    )
-
-    return default_path
-
-
-@pytest.fixture(scope="session")
-def incorrect_auction_time():
-    bad_time_path = os.path.join(
-        os.path.dirname(__file__), "fixtures", "incorrect_time.txt"
-    )
-
-    return bad_time_path
-
-
-# you can define and use this mock as a
-# function argument wherever necessary
+# you can define and use this mock as a function argument wherever necessary
 # @pytest.fixture(scope="function")
 # def mock_initialize_tables(monkeypatch):
 #     monkeypatch.setattr(
 #         'application.auction.initialize_tables',
 #         lambda x: None
 #     )
-
-
-@pytest.fixture(scope="session")
-def tea_pot_bid_check():
-    tea_pot_bids_path = os.path.join(
-        os.path.dirname(__file__), "fixtures", "test_bid_check_1.txt"
-    )
-
-    return tea_pot_bids_path
