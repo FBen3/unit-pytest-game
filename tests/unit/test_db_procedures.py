@@ -83,7 +83,7 @@ def test_create_auction_table():
             );""")  # checks that the mock was called exactly once, and with the specified arguments
 
 
-def test_process_listing(monkeypatch):
+def test_process_listing():
     auction_listing_line = ["10", "1", "toaster_1", "10.00", "20"]
 
     with patch('application.db_procedures.psycopg2.connect') as mock_conn:
