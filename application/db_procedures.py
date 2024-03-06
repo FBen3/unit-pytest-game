@@ -13,27 +13,30 @@ db_conn_params = fetch_database_params()
 # patch/mock in your test, this function has already executed (and set the global cached value) and its return value stored.
 
 
-def update_status(item: str, custom_conn=None):
-    with psycopg2.connect(**db_conn_params) as conn:
-        conn = conn if custom_conn is None else custom_conn
-        with conn.cursor() as cur:
-            cur.execute("UPDATE auction SET status = 'SOLD' WHERE item = %s", (item,))  # fmt: skip
+def update_status(item: str, conn=None):
+    if conn is None:
+        conn = psycopg2.connect(**db_conn_params)
+
+    with conn.cursor() as cur:
+        cur.execute("UPDATE auction SET status = 'SOLD' WHERE item = %s", (item,))  # fmt: skip
 
 
-def all_unexpired_items(time: int, custom_conn=None):
-    with psycopg2.connect(**db_conn_params) as conn:
-        conn = conn if custom_conn is None else custom_conn
-        with conn.cursor() as cur:
+def all_unexpired_items(time: int, conn=None):
+    if conn is None:
+        conn = psycopg2.connect(**db_conn_params)
+
+    with conn.cursor() as cur:
             cur.execute("SELECT item FROM auction WHERE status = 'UNSOLD' AND closing_time <= %s", (time,))  # fmt: skip
             all_auctioned_items = [row[0] for row in cur.fetchall()]
 
     return all_auctioned_items
 
 
-def calculate_final_item_stats(item: str, custom_conn=None):
-    with psycopg2.connect(**db_conn_params) as conn:
-        conn = conn if custom_conn is None else custom_conn
-        with conn.cursor() as cur:
+def calculate_final_item_stats(item: str, conn=None):
+    if conn is None:
+        conn = psycopg2.connect(**db_conn_params)
+
+    with conn.cursor() as cur:
             cur.execute(
                 """
                 SELECT 
@@ -123,10 +126,11 @@ def calculate_final_item_stats(item: str, custom_conn=None):
             return stats_dict
 
 
-def bid_check(bidder: str, bid_time: str, item: str, amount: str, custom_conn=None):
-    with psycopg2.connect(**db_conn_params) as conn:
-        conn = conn if custom_conn is None else custom_conn
-        with conn.cursor() as cur:
+def bid_check(bidder: str, bid_time: str, item: str, amount: str, conn=None):
+    if conn is None:
+        conn = psycopg2.connect(**db_conn_params)
+
+    with conn.cursor() as cur:
             cur.execute(
                 """
                 SELECT
@@ -154,12 +158,11 @@ def bid_check(bidder: str, bid_time: str, item: str, amount: str, custom_conn=No
     return False
 
 
-def process_bidding(bid_time: str, bidder: str, item: str, bid_amount: str, custom_conn=None):
-    if bid_check(
-        bidder, bid_time, item, bid_amount
-    ):  # invalid bids are not recorded
-        with psycopg2.connect(**db_conn_params) as conn:
-            conn = conn if custom_conn is None else custom_conn
+def process_bidding(bid_time: str, bidder: str, item: str, bid_amount: str, conn=None):
+    if conn is None:
+        conn = psycopg2.connect(**db_conn_params)
+
+    if bid_check(bidder, bid_time, item, bid_amount):  # invalid bids are not recorded
             with conn.cursor() as cur:
                 cur.execute(
                     """
@@ -169,18 +172,11 @@ def process_bidding(bid_time: str, bidder: str, item: str, bid_amount: str, cust
                 )  # will handle data conversion automatically
 
 
-def process_listing(
-    opening_time: str,
-    seller: str,
-    item: str,
-    reserve_price: str,
-    closing_time: str,
-    custom_conn=None,
-):
-    ##### catch error in test: psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "auction_key"
-    with psycopg2.connect(**db_conn_params) as conn:
-        conn = conn if custom_conn is None else custom_conn
-        with conn.cursor() as cur:
+def process_listing(opening_time: str, seller: str, item: str, reserve_price: str, closing_time: str, conn=None):
+    if conn is None:
+        conn = psycopg2.connect(**db_conn_params)
+
+    with conn.cursor() as cur:
             cur.execute(
                 """
                 INSERT INTO auction (item, seller, reserve_price, opening_time, closing_time, status) 
@@ -223,13 +219,12 @@ def create_auction_table(connection: Connection):
         )
 
 
-def initialize_tables(save_database: bool, custom_conn=None):
+def initialize_tables(save_database: bool, db_conn=db_conn_params):
     print("Initiating database setup:")
     if not save_database:
         try:
             # fmt: off
-            with psycopg2.connect(**db_conn_params) as conn:  # connect to database (open & close connections automatically)
-                conn = conn if custom_conn is None else custom_conn
+            with psycopg2.connect(**db_conn) as conn:  # connect to database (open & close connections automatically)
                 with conn.cursor() as cur:  # manage database resources (cursor object)
                     # fmt: on
                     cur.execute("""

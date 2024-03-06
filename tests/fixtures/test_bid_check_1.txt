@@ -1,0 +1,2 @@
+6|8|BID|tea_pot_1|2.50
+8|5|BID|tea_pot_1|5.75
