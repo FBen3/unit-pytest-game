@@ -7,16 +7,22 @@ from application.config import fetch_database_params
 
 
 db_conn_params = fetch_database_params()
+# Note: that as it's used here, this function is called at import time (i.e. when this db_procedures module is imported);
+# (as opposed to e.g. runtime, i.e. when the func is actually called). And, as a result, its value is stored as a global
+# variable. As such, any attempt to mock this will be VERY difficult. Because by the time you attempt to apply the
+# patch/mock in your test, this function has already executed (and set the global cached value) and its return value stored.
 
 
-def update_status(item: str):
+def update_status(item: str, custom_conn=None):
     with psycopg2.connect(**db_conn_params) as conn:
+        conn = conn if custom_conn is None else custom_conn
         with conn.cursor() as cur:
             cur.execute("UPDATE auction SET status = 'SOLD' WHERE item = %s", (item,))  # fmt: skip
 
 
-def all_unexpired_items(time: int):
+def all_unexpired_items(time: int, custom_conn=None):
     with psycopg2.connect(**db_conn_params) as conn:
+        conn = conn if custom_conn is None else custom_conn
         with conn.cursor() as cur:
             cur.execute("SELECT item FROM auction WHERE status = 'UNSOLD' AND closing_time <= %s", (time,))  # fmt: skip
             all_auctioned_items = [row[0] for row in cur.fetchall()]
@@ -24,8 +30,9 @@ def all_unexpired_items(time: int):
     return all_auctioned_items
 
 
-def calculate_final_item_stats(item: str):
+def calculate_final_item_stats(item: str, custom_conn=None):
     with psycopg2.connect(**db_conn_params) as conn:
+        conn = conn if custom_conn is None else custom_conn
         with conn.cursor() as cur:
             cur.execute(
                 """
@@ -116,9 +123,9 @@ def calculate_final_item_stats(item: str):
             return stats_dict
 
 
-def bid_check(bidder: str, bid_time: str, item: str, amount: str):
-    ##### catch error in test: if closing_time is after clock time
+def bid_check(bidder: str, bid_time: str, item: str, amount: str, custom_conn=None):
     with psycopg2.connect(**db_conn_params) as conn:
+        conn = conn if custom_conn is None else custom_conn
         with conn.cursor() as cur:
             cur.execute(
                 """
@@ -147,11 +154,12 @@ def bid_check(bidder: str, bid_time: str, item: str, amount: str):
     return False
 
 
-def process_bidding(bid_time: str, bidder: str, item: str, bid_amount: str):
+def process_bidding(bid_time: str, bidder: str, item: str, bid_amount: str, custom_conn=None):
     if bid_check(
         bidder, bid_time, item, bid_amount
     ):  # invalid bids are not recorded
         with psycopg2.connect(**db_conn_params) as conn:
+            conn = conn if custom_conn is None else custom_conn
             with conn.cursor() as cur:
                 cur.execute(
                     """
@@ -167,9 +175,11 @@ def process_listing(
     item: str,
     reserve_price: str,
     closing_time: str,
+    custom_conn=None,
 ):
     ##### catch error in test: psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "auction_key"
     with psycopg2.connect(**db_conn_params) as conn:
+        conn = conn if custom_conn is None else custom_conn
         with conn.cursor() as cur:
             cur.execute(
                 """
@@ -213,12 +223,13 @@ def create_auction_table(connection: Connection):
         )
 
 
-def initialize_tables(save_database: bool, db_conn=db_conn_params):
+def initialize_tables(save_database: bool, custom_conn=None):
     print("Initiating database setup:")
     if not save_database:
         try:
             # fmt: off
-            with psycopg2.connect(**db_conn) as conn:  # connect to database (open & close connections automatically)
+            with psycopg2.connect(**db_conn_params) as conn:  # connect to database (open & close connections automatically)
+                conn = conn if custom_conn is None else custom_conn
                 with conn.cursor() as cur:  # manage database resources (cursor object)
                     # fmt: on
                     cur.execute("""
