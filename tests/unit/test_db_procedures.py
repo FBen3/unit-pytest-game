@@ -95,3 +95,4 @@ def test_process_listing():
                 VALUES (%s, %s, %s, %s, %s, 'UNSOLD');
             """, ("toaster_1", "1", "10.00", "10", "20")
             )
+##### catch error in test: psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "auction_key"
