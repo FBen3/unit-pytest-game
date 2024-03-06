@@ -20,6 +20,8 @@ def update_status(item: str, conn=None):
     with conn.cursor() as cur:
         cur.execute("UPDATE auction SET status = 'SOLD' WHERE item = %s", (item,))  # fmt: skip
 
+    conn.commit()
+
 
 def all_unexpired_items(time: int, conn=None):
     if conn is None:
@@ -171,6 +173,8 @@ def process_bidding(bid_time: str, bidder: str, item: str, bid_amount: str, conn
                 """, (item, bid_amount, bid_time, bidder)  # fmt: skip
                 )  # will handle data conversion automatically
 
+    conn.commit()
+
 
 def process_listing(opening_time: str, seller: str, item: str, reserve_price: str, closing_time: str, conn=None):
     if conn is None:
@@ -183,6 +187,8 @@ def process_listing(opening_time: str, seller: str, item: str, reserve_price: st
                 VALUES (%s, %s, %s, %s, %s, 'UNSOLD');
             """, (item, seller, reserve_price, opening_time, closing_time)  # fmt: skip
             )
+
+    conn.commit()
 
 
 def create_bids_table(connection: Connection):
