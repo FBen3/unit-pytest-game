@@ -28,8 +28,8 @@ def all_unexpired_items(time: int, conn=None):
         conn = psycopg2.connect(**db_conn_params)
 
     with conn.cursor() as cur:
-            cur.execute("SELECT item FROM auction WHERE status = 'UNSOLD' AND closing_time <= %s", (time,))  # fmt: skip
-            all_auctioned_items = [row[0] for row in cur.fetchall()]
+        cur.execute("SELECT item FROM auction WHERE status = 'UNSOLD' AND closing_time <= %s", (time,))  # fmt: skip
+        all_auctioned_items = [row[0] for row in cur.fetchall()]
 
     return all_auctioned_items
 
@@ -39,93 +39,93 @@ def calculate_final_item_stats(item: str, conn=None):
         conn = psycopg2.connect(**db_conn_params)
 
     with conn.cursor() as cur:
-            cur.execute(
-                """
+        cur.execute(
+            """
+            SELECT 
+                a.item,
+                a.closing_time,
+                a.reserve_price,
+                a.status,
+                bid_details.max_bidder,
+                bid_details.max_amount,
+                bid_stats.min_amount,
+                bid_stats.total_bid_count,
+                second_highest_bid.second_max_amount
+            FROM 
+                auction a
+            JOIN (
                 SELECT 
-                    a.item,
-                    a.closing_time,
-                    a.reserve_price,
-                    a.status,
-                    bid_details.max_bidder,
-                    bid_details.max_amount,
-                    bid_stats.min_amount,
-                    bid_stats.total_bid_count,
-                    second_highest_bid.second_max_amount
+                    b1.item,
+                    b1.bidder as max_bidder,
+                    b1.amount as max_amount
                 FROM 
-                    auction a
+                    bids b1
                 JOIN (
                     SELECT 
-                        b1.item,
-                        b1.bidder as max_bidder,
-                        b1.amount as max_amount
-                    FROM 
-                        bids b1
-                    JOIN (
-                        SELECT 
-                            item, 
-                            MAX(amount) as max_amount
-                        FROM 
-                            bids
-                        WHERE 
-                            item = %s
-                        GROUP BY 
-                            item
-                    ) max_bids ON b1.item = max_bids.item AND b1.amount = max_bids.max_amount
-                    WHERE 
-                        b1.item = %s
-                    ORDER BY 
-                        b1.bid_time ASC
-                    LIMIT 1
-                ) bid_details ON a.item = bid_details.item
-                JOIN (
-                    SELECT 
-                        item,
-                        MIN(amount) as min_amount,
-                        COUNT(id) as total_bid_count
+                        item, 
+                        MAX(amount) as max_amount
                     FROM 
                         bids
                     WHERE 
                         item = %s
                     GROUP BY 
                         item
-                ) bid_stats ON a.item = bid_stats.item
-                LEFT JOIN (
+                ) max_bids ON b1.item = max_bids.item AND b1.amount = max_bids.max_amount
+                WHERE 
+                    b1.item = %s
+                ORDER BY 
+                    b1.bid_time ASC
+                LIMIT 1
+            ) bid_details ON a.item = bid_details.item
+            JOIN (
+                SELECT 
+                    item,
+                    MIN(amount) as min_amount,
+                    COUNT(id) as total_bid_count
+                FROM 
+                    bids
+                WHERE 
+                    item = %s
+                GROUP BY 
+                    item
+            ) bid_stats ON a.item = bid_stats.item
+            LEFT JOIN (
+                SELECT 
+                    item,
+                    amount AS second_max_amount
+                FROM (
                     SELECT 
                         item,
-                        amount AS second_max_amount
-                    FROM (
-                        SELECT 
-                            item,
-                            amount,
-                            ROW_NUMBER() OVER (PARTITION BY item ORDER BY amount DESC) as bid_rank
-                        FROM 
-                            bids
-                        WHERE 
-                            item = %s
-                    ) ranked_bids
+                        amount,
+                        ROW_NUMBER() OVER (PARTITION BY item ORDER BY amount DESC) as bid_rank
+                    FROM 
+                        bids
                     WHERE 
-                        bid_rank = 2
-                ) second_highest_bid ON a.item = second_highest_bid.item
+                        item = %s
+                ) ranked_bids
                 WHERE 
-                    a.item = %s;
-            """, (item, item, item, item, item)  # fmt: skip
-            )
+                    bid_rank = 2
+            ) second_highest_bid ON a.item = second_highest_bid.item
+            WHERE 
+                a.item = %s;
+        """, (item, item, item, item, item)  # fmt: skip
+        )
 
-            stats = cur.fetchone()
+        stats = cur.fetchone()
 
-            stats_dict = {
-                "item": stats[0],
-                "bidder": stats[4],
-                "highest_bid": float(stats[5]),
-                "second_highest_bid": float(stats[8]) if stats[8] else None,
-                "lowest_bid": float(stats[6]),
-                "total_bid_count": stats[7],
-                "reserve_price": float(stats[2]),
-                "closing_time": stats[1],
-                "status": stats[3],
-            }
+        stats_dict = {
+            "item": stats[0],
+            "bidder": stats[4],
+            "highest_bid": float(stats[5]),
+            "second_highest_bid": float(stats[8]) if stats[8] else None,
+            "lowest_bid": float(stats[6]),
+            "total_bid_count": stats[7],
+            "reserve_price": float(stats[2]),
+            "closing_time": stats[1],
+            "status": stats[3],
+        }
 
-            return stats_dict
+        return stats_dict
 
 
 def bid_check(bidder: str, bid_time: str, item: str, amount: str, conn=None):
@@ -133,24 +133,24 @@ def bid_check(bidder: str, bid_time: str, item: str, amount: str, conn=None):
         conn = psycopg2.connect(**db_conn_params)
 
     with conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT
-                    a.closing_time,
-                    a.status,
-                    MAX(b.amount) AS highest_bid_by_user
-                FROM
-                    auction a
-                LEFT JOIN
-                    bids b ON a.item = b.item AND b.bidder = %s
-                WHERE
-                    a.item = %s
-                GROUP BY
-                    a.reserve_price, a.closing_time, a.status;
-            """, (bidder, item)  # fmt: skip
-            )
+        cur.execute(
+            """
+            SELECT
+                a.closing_time,
+                a.status,
+                MAX(b.amount) AS highest_bid_by_user
+            FROM
+                auction a
+            LEFT JOIN
+                bids b ON a.item = b.item AND b.bidder = %s
+            WHERE
+                a.item = %s
+            GROUP BY
+                a.reserve_price, a.closing_time, a.status;
+        """, (bidder, item)  # fmt: skip
+        )
 
-            closing_time, status, highest_bid = cur.fetchone()
+        closing_time, status, highest_bid = cur.fetchone()
 
     if status == "UNSOLD" and int(bid_time) < closing_time:
         if highest_bid and Decimal(amount) < highest_bid:  # user's bid cannot be lower than his last
@@ -165,15 +165,15 @@ def process_bidding(bid_time: str, bidder: str, item: str, bid_amount: str, conn
         conn = psycopg2.connect(**db_conn_params)
 
     if bid_check(bidder, bid_time, item, bid_amount):  # invalid bids are not recorded
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                       INSERT INTO bids (item, amount, bid_time, bidder) 
-                       VALUES (%s, %s, %s, %s);
-                """, (item, bid_amount, bid_time, bidder)  # fmt: skip
-                )  # will handle data conversion automatically
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                   INSERT INTO bids (item, amount, bid_time, bidder) 
+                   VALUES (%s, %s, %s, %s);
+            """, (item, bid_amount, bid_time, bidder)  # fmt: skip
+            )  # will handle data conversion automatically
 
-    conn.commit()
+        conn.commit()
 
 
 def process_listing(opening_time: str, seller: str, item: str, reserve_price: str, closing_time: str, conn=None):
@@ -181,12 +181,12 @@ def process_listing(opening_time: str, seller: str, item: str, reserve_price: st
         conn = psycopg2.connect(**db_conn_params)
 
     with conn.cursor() as cur:
-            cur.execute(
-                """
-                INSERT INTO auction (item, seller, reserve_price, opening_time, closing_time, status) 
-                VALUES (%s, %s, %s, %s, %s, 'UNSOLD');
-            """, (item, seller, reserve_price, opening_time, closing_time)  # fmt: skip
-            )
+        cur.execute(
+            """
+            INSERT INTO auction (item, seller, reserve_price, opening_time, closing_time, status) 
+            VALUES (%s, %s, %s, %s, %s, 'UNSOLD');
+        """, (item, seller, reserve_price, opening_time, closing_time)  # fmt: skip
+        )
 
     conn.commit()
 
