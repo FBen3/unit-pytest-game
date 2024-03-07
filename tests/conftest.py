@@ -34,7 +34,19 @@ def insert_tea_pot_listing(db_connections):
             VALUES ('tea_pot_1', 2, 7.00, 4, 20, 'UNSOLD');
         """)
 
-        db_connections.commit()
+    db_connections.commit()
+
+
+@pytest.fixture(scope="session")
+def insert_tea_pot_bid(db_connections):
+    with db_connections.cursor() as cur:
+        cur.execute("DELETE FROM bids WHERE item = 'tea_pot_1'")
+        cur.execute("""
+            INSERT INTO bids (item, amount, bid_time, bidder)
+            VALUES ('tea_pot_1', 8.50, 10, 5);
+        """)
+
+    db_connections.commit()
 
 
 @pytest.fixture(scope="session")
@@ -58,7 +70,7 @@ def incorrect_auction_time():
 @pytest.fixture(scope="session")
 def tea_pot_bid_check():
     tea_pot_bids_path = os.path.join(
-        os.path.dirname(__file__), "fixtures", "test_bid_check_1.txt"
+        os.path.dirname(__file__), "fixtures", "test_bid_check.txt"
     )
 
     return tea_pot_bids_path
@@ -95,9 +107,9 @@ def unsuccessful_bid_example():
 
 
 # you can define and use this mock as a function argument wherever necessary
-# @pytest.fixture(scope="function")
-# def mock_initialize_tables(monkeypatch):
-#     monkeypatch.setattr(
-#         'application.auction.initialize_tables',
-#         lambda x: None
-#     )
+@pytest.fixture(scope="function")
+def suppress_initialize_tables(monkeypatch):
+    monkeypatch.setattr(
+        'application.auction.initialize_tables',
+        lambda x: None
+    )

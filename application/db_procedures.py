@@ -153,7 +153,7 @@ def bid_check(bidder: str, bid_time: str, item: str, amount: str, conn=None):
             closing_time, status, highest_bid = cur.fetchone()
 
     if status == "UNSOLD" and int(bid_time) < closing_time:
-        if highest_bid and Decimal(amount) < highest_bid:
+        if highest_bid and Decimal(amount) < highest_bid:  # user's bid cannot be lower than his last
             return False
         return True  # accept any initial amount
 
