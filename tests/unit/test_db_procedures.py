@@ -5,7 +5,8 @@ from unittest.mock import patch, MagicMock, call
 from application.db_procedures import (
     initialize_tables,
     create_auction_table,
-    process_listing
+    process_listing,
+    bid_check
 )
 
 
@@ -89,10 +90,19 @@ def test_process_listing():
     with patch('application.db_procedures.psycopg2.connect') as mock_conn:
         process_listing(*auction_listing_line)
 
-        mock_conn.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value.execute.assert_called_once_with(
-                """
-                INSERT INTO auction (item, seller, reserve_price, opening_time, closing_time, status) 
-                VALUES (%s, %s, %s, %s, %s, 'UNSOLD');
-            """, ("toaster_1", "1", "10.00", "10", "20")
+        mock_conn.return_value.cursor.return_value.__enter__.return_value.execute.assert_called_once_with(
+            """
+            INSERT INTO auction (item, seller, reserve_price, opening_time, closing_time, status) 
+            VALUES (%s, %s, %s, %s, %s, 'UNSOLD');
+        """, ("toaster_1", "1", "10.00", "10", "20")
             )
-##### catch error in test: psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "auction_key"
+
+
+def test_bid_check_after_closing_time():
+    auction_bid_line = ["5", "21", "tea_pot_1", "9.50"]
+
+    with patch('application.db_procedures.psycopg2.connect') as mock_conn:
+        mock_conn.return_value.cursor.return_value.__enter__.return_value.fetchone.return_value = [20, "UNSOLD", 8.50]
+        result = bid_check(*auction_bid_line)
+
+        assert result == False
