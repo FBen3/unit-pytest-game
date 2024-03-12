@@ -1,10 +1,13 @@
 import pytest
 from psycopg2.errors import UniqueViolation
 
-from unittest.mock import patch, MagicMock
-
 from application.auction import Auction  # used for test_bid_check
-from application.db_procedures import *
+from application.db_procedures import (
+    process_bidding,
+    bid_check,
+    process_listing,
+    calculate_final_item_stats
+)
 
 
 # def test_bid_check(monkeypatch, db_connections, insert_tea_pot_listing, tea_pot_bid_check):
@@ -38,7 +41,7 @@ from application.db_procedures import *
 #     # You've done it; see how bad it is. This is not a good test anymore so strive for legitimate testing procedure now.
 
 
-def test_process_bidding(monkeypatch, db_connections, suppress_initialize_tables, insert_tea_pot_listing, insert_tea_pot_bid):
+def test_process_bidding(monkeypatch, db_connections, insert_tea_pot_listing, insert_tea_pot_bid):
     monkeypatch.setattr(
         'application.db_procedures.bid_check',
         lambda *x: bid_check(*x, db_connections)
@@ -64,20 +67,14 @@ def test_process_bidding(monkeypatch, db_connections, suppress_initialize_tables
     assert result[1][2] == 9.50
 
 
-def test_process_listing_after_closing_time(db_connections, suppress_initialize_tables, insert_tea_pot_listing):
+def test_process_listing_after_closing_time(db_connections, insert_tea_pot_listing):
     with pytest.raises(UniqueViolation, match='duplicate key value violates unique constraint "auction_pkey"'):
         auction_listing_line = ["5", "3", "tea_pot_1", "17.00", "21"]
         process_listing(*auction_listing_line)
 
 
 
-##### catch error in test: if closing_time is after clock time
 
-# 4|2|SELL|tea_pot_1|7.00|20
-# 6|8|BID|tea_pot_1|2.50
-# 8|5|BID|tea_pot_1|5.75
-# 10|5|BID|tea_pot_1|8.50  <---
-# 11|5|BID|tea_pot_1|9.50  <---
 
 
 
