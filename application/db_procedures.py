@@ -19,6 +19,12 @@ def update_status(item: str, conn=None):
 
     with conn.cursor() as cur:
         cur.execute("UPDATE auction SET status = 'SOLD' WHERE item = %s", (item,))  # fmt: skip
+        # note: the reason it's important to pass `(item,)` and not `(item)`
+        # or just `item`, (which would be the same thing btw), is because as
+        # per psycopg2 best-practice implementation `execute()` expects a sequence
+        # (even if there's only one parameter!). This implementation also guards
+        # against SQL injection attacks, and handles automatic type conversion
+        # before entering the DB.
 
     conn.commit()
 
