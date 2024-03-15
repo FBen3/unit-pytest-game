@@ -50,6 +50,24 @@ def insert_tea_pot_bid(db_connections):
 
 
 @pytest.fixture(scope="session")
+def insert_bed_lamp_listing_and_bids(db_connections):
+    with db_connections.cursor() as cur:
+        cur.execute("DELETE FROM bids WHERE item = 'bed_lamp_1'")
+        cur.execute("""
+            INSERT INTO auction (item, seller, reserve_price, opening_time, closing_time, status) 
+            VALUES ('bed_lamp_1', 18, 5.00, 1, 21, 'UNSOLD');
+        """)
+        cur.execute("""
+            INSERT INTO bids (item, amount, bid_time, bidder) VALUES 
+                ('bed_lamp_1', 6.00, 2, 10),
+                ('bed_lamp_1', 7.00, 3, 13),
+                ('bed_lamp_1', 7.20, 5, 10);
+        """)
+
+    db_connections.commit()
+
+
+@pytest.fixture(scope="session")
 def default_auction():
     default_path = os.path.join(
         os.path.dirname(__file__), "fixtures", "default_input.txt"
