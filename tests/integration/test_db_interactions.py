@@ -73,6 +73,36 @@ def test_process_listing_after_closing_time(db_connections, insert_tea_pot_listi
         process_listing(*auction_listing_line)
 
 
+# test this whilst populating a database with medium size input
+
+def test_calculate_final_item_stats(db_connections, medium_input):
+
+
+
+
+    items = []
+    sql_query = """"""
+
+
+    pass
+
+
+
+
+
+
+
+
+
+# # [OK]
+# def test_all_unexpired_items():
+#     pass
+#
+#
+# # [OK]
+# def test_update_stats(db_connections, suppress_initialize_tables):
+#     pass
+
 
 
 
