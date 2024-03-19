@@ -1,27 +1,31 @@
-10|1|SELL|laptop_1|500.00|30
-11|4|BID|laptop_1|450.00
-12|5|BID|laptop_1|550.00
-15|2|SELL|camera_1|200.00|40
-16|6|BID|camera_1|180.00
-17|7|BID|camera_1|210.00
-18|4|BID|laptop_1|600.00
-20|3|SELL|watch_1|150.00|50
-21|8|BID|watch_1|160.00
-22|5|BID|camera_1|220.00
-25|7|BID|watch_1|170.00
-30
-35|6|BID|watch_1|180.00
-40
-50
-
+1|1|SELL|laptop_2|60.00|10
+2|4|BID|laptop_2|30.00
+3
+4|5|BID|laptop_2|35.99
+5|5|SELL|camera_1|27.00|17
+6|6|BID|camera_1|27.00
+8|3|SELL|watch_3|50.00|16
+9|8|BID|laptop_2|34.99
+10|7|SELL|fork_1|8.25|18
+11
+13|4|BID|watch_3|32.00
+15|6|BID|watch_3|32.00
+16|7|BID|watch_3|35.00
+17
+18
 
 -----
-30|laptop_1|4|SOLD|550.00|3|600.00|450.00
-40|camera_1|5|SOLD|210.00|3|220.00|180.00
-50|watch_1|6|SOLD|170.00|3|180.00|160.00
+# 30|laptop_2|4|SOLD|550.00|3|600.00|450.00
+# 40|camera_1|5|SOLD|210.00|3|220.00|180.00
+# 50|watch_1|6|SOLD|170.00|3|180.00|160.00
+#
 
+laptop_2    s: 1    rev_p: 25   c_t: 10     bids: (30, 4), (35.99, 5), (34.99, 8)
+camera_1    s: 5    rev_p: 27   c_t: 17     bids: (27, 6)
+watch_3     s: 3    rev_p: 50   c_t: 16     bids: (32, 6), (32, 4), {(35, 7)}
+fork_1      s: 7    rev_p: 8.25 c_6: 18     bids:
 
-
+1,2,3,5,7
 -----
 edge cases:
 
