@@ -77,6 +77,33 @@ def default_auction():
 
 
 @pytest.fixture(scope="session")
+def small_input():
+    small_input_path = os.path.join(
+        os.path.dirname(__file__), "fixtures", "small_input.txt"
+    )
+
+    return small_input_path
+
+
+@pytest.fixture(scope="session")
+def medium_input():
+    medium_input_path = os.path.join(
+        os.path.dirname(__file__), "fixtures", "medium_input.txt"
+    )
+
+    return medium_input_path
+
+
+@pytest.fixture(scope="session")
+def large_input():
+    large_input_path = os.path.join(
+        os.path.dirname(__file__), "fixtures", "large_input.txt"
+    )
+
+    return large_input_path
+
+
+@pytest.fixture(scope="session")
 def incorrect_auction_time():
     bad_time_path = os.path.join(
         os.path.dirname(__file__), "fixtures", "incorrect_time.txt"

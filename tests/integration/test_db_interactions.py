@@ -1,12 +1,15 @@
 import pytest
 from psycopg2.errors import UniqueViolation
 
-from application.auction import Auction  # used for test_bid_check
+from application.auction import Auction
 from application.db_procedures import (
     process_bidding,
     bid_check,
     process_listing,
-    calculate_final_item_stats
+    calculate_final_item_stats,
+    check_no_bids,
+    all_unexpired_items,
+    update_status
 )
 
 
@@ -70,41 +73,67 @@ def test_process_bidding(monkeypatch, db_connections, insert_tea_pot_listing, in
 def test_process_listing_after_closing_time(db_connections, insert_tea_pot_listing):
     with pytest.raises(UniqueViolation, match='duplicate key value violates unique constraint "auction_pkey"'):
         auction_listing_line = ["5", "3", "tea_pot_1", "17.00", "21"]
-        process_listing(*auction_listing_line)
+        process_listing(*auction_listing_line, db_connections)
 
 
-# test this whilst populating a database with medium size input
+def test_calculate_final_item_stats(monkeypatch, db_connections, suppress_initialize_tables, small_input):
+    monkeypatch.setattr(
+        'application.auction.process_listing',
+        lambda *x: process_listing(*x, db_connections)
+    )
+    monkeypatch.setattr(
+        'application.auction.process_bidding',
+        lambda *x: process_bidding(*x, db_connections)
+    )
+    monkeypatch.setattr(
+        'application.db_procedures.bid_check',
+        lambda *x: bid_check(*x, db_connections)
+    )
+    monkeypatch.setattr(
+        'application.db_procedures.check_no_bids',
+        lambda x: check_no_bids(x, db_connections)
+    )
 
-def test_calculate_final_item_stats(db_connections, medium_input):
+    auction = Auction(save_option=False)
+    auction.run(small_input)
+
+    result = calculate_final_item_stats("camera_1", db_connections)
+
+    assert result is not None
+    assert result['item'] == "camera_1"
+    assert result['bidder'] == 6
+    assert result['highest_bid'] == 27.0
+    assert result['second_highest_bid'] is None
+    assert result['lowest_bid'] == 27.0
+    assert result['total_bid_count'] == 1
+    assert result['reserve_price'] == 27.0
+    assert result['closing_time'] == 17
+    assert result['status'] == "UNSOLD"
 
 
+def test_all_unexpired_items(db_connections, insert_tea_pot_listing):
+    result = all_unexpired_items(21, db_connections)
+
+    assert result == ['tea_pot_1']
 
 
-    items = []
-    sql_query = """"""
+def test_update_stats(db_connections, insert_tea_pot_listing):
+    update_status("tea_pot_1", db_connections)
 
+    with db_connections.cursor() as cur:
+        cur.execute("""
+            SELECT
+                item,
+                status
+            FROM
+                auction
+            WHERE
+                item = %s
+        """, ("tea_pot_1",)
+        )
 
-    pass
+        result = cur.fetchone()
 
-
-
-
-
-
-
-
-
-# # [OK]
-# def test_all_unexpired_items():
-#     pass
-#
-#
-# # [OK]
-# def test_update_stats(db_connections, suppress_initialize_tables):
-#     pass
-
-
-
-
-
-
+    assert result is not None
+    assert result[0] == "tea_pot_1"
+    assert result[1] == "SOLD"
