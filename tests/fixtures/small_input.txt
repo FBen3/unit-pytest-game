@@ -8,74 +8,8 @@
 9|8|BID|laptop_2|34.99
 10|7|SELL|fork_1|8.25|18
 11
-13|4|BID|watch_3|32.00
-15|6|BID|watch_3|32.00
+13|4|BID|watch_3|57.00
+15|6|BID|watch_3|57.00
 16|7|BID|watch_3|35.00
 17
 18
-
------
-# 30|laptop_2|4|SOLD|550.00|3|600.00|450.00
-# 40|camera_1|5|SOLD|210.00|3|220.00|180.00
-# 50|watch_1|6|SOLD|170.00|3|180.00|160.00
-#
-
-laptop_2    s: 1    rev_p: 25   c_t: 10     bids: (30, 4), (35.99, 5), (34.99, 8)
-camera_1    s: 5    rev_p: 27   c_t: 17     bids: (27, 6)
-watch_3     s: 3    rev_p: 50   c_t: 16     bids: (32, 6), (32, 4), {(35, 7)}
-fork_1      s: 7    rev_p: 8.25 c_6: 18     bids:
-
-1,2,3,5,7
------
-edge cases:
-
-1. Single Bid Just Meeting Reserve Price:
-    If only one bid is placed and it exactly meets the reserve price, the bidder should win the auction at the reserve
-    price, according to the rules. This situation tests the handling of auctions with a minimal number of bids.
-
-2. Bids Below Reserve Price:
-    If all bids are below the reserve price, the item should remain unsold. This scenario checks how the system handles
-    auctions where interest does not meet the seller's minimum expectation.
-
-3. Multiple Bids at the Same Highest Amount:
-    If multiple bids are placed at the same highest amount, the earliest bid at that amount should win, but the price
-    paid is an interesting consideration if the second-highest bid is of a different value or also the same.
-
-4. Bids with the Same Amount from the Same User:
-    A user might bid the same amount more than once, with the expectation that only the first bid counts as valid
-    based on the rules. The system needs to ignore subsequent identical bids from the same user when considering
-    the winning and second-highest bids.
-
-5. Late Bids:
-    Bids received after the auction's closing time should be invalid, even if they're higher than all previous bids.
-    Handling the exact closing time boundary (bids arriving precisely at the closing time) is crucial.
-
-6. Early Bids:
-    Bids placed before the auction starts are clearly invalid but handling them properly (especially if they're
-    timestamped exactly at the start time) is necessary for consistency.
-
-7. No Bids:
-    When no bids are placed for an auction, the item remains unsold. This case tests the system's ability to handle
-    auctions with no participant interest.
-
-8. Decreasing Bid Amounts from the Same User:
-    A user might place a higher bid and then try to place a lower bid. According to the rules, the lower bid should
-    be considered invalid since it's not larger than the user's previous valid bid.
-
-9. Multiple Auctions for the Same Item:
-    If the system somehow allows the same item to be listed in more than one auction simultaneously or before the
-    previous auction concludes, it could create conflicts regarding which auction the bids apply to and how to handle
-    the item's sale status.
-
-10. Edge Case in Bid Increments:
-    The rules don't specify minimum bid increments. So, if there's a very small increment above the second-highest
-    bid (e.g., $0.01), it could lead to scenarios where the winning bid is only marginally higher than the
-    second-highest bid, affecting the final price paid.
-
-11. Handling Ties in Bid Submission Time:
-    In a digital system, it's conceivable (though rare) that two bids could be timestamped identically,
-    especially in systems with lower resolution clocks. Determining which bid is considered "earlier" in such a
-    case would need clear rules.
-
-Addressing these edge cases in the auction system's design and implementation would be crucial for ensuring fair and predictable outcomes for both buyers and sellers.
-
