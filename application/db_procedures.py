@@ -40,7 +40,58 @@ def all_unexpired_items(time: int, conn=None):
     return all_auctioned_items
 
 
+def check_no_bids(item: str, conn=None):
+    if conn is None:
+        conn = psycopg2.connect(**db_conn_params)
+
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT 
+                a.item, 
+                a.reserve_price, 
+                a.closing_time,
+                b.bid_count
+            FROM 
+                auction a
+            LEFT JOIN (
+                SELECT
+                    item,
+                    COUNT(*) as bid_count
+                FROM
+                    bids b
+                WHERE
+                    item = %s
+                GROUP BY
+                    item
+            ) b ON a.item = b.item
+            WHERE 
+                a.item = %s
+        """, (item, item)
+        )
+
+        _, reserve_price, closing_time, bid_count = cur.fetchone()
+
+    if bid_count is None:
+        return {
+            "item": item,
+            "bidder": None,
+            "highest_bid": 0.00,
+            "second_highest_bid": 0.00,
+            "lowest_bid": 0.00,
+            "total_bid_count": 0,
+            "reserve_price": reserve_price,
+            "closing_time": closing_time,
+            "status": "UNSOLD",
+        }
+
+    return False
+
+
 def calculate_final_item_stats(item: str, conn=None):
+    no_bid_stats = check_no_bids(item)
+    if no_bid_stats:
+        return no_bid_stats
+
     if conn is None:
         conn = psycopg2.connect(**db_conn_params)
 
