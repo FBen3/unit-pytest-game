@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 from psycopg2.errors import UniqueViolation
 
@@ -74,6 +76,102 @@ def test_process_listing_after_closing_time(db_connections, insert_tea_pot_listi
     with pytest.raises(UniqueViolation, match='duplicate key value violates unique constraint "auction_pkey"'):
         auction_listing_line = ["5", "3", "tea_pot_1", "17.00", "21"]
         process_listing(*auction_listing_line, db_connections)
+
+
+def test_second_highest_bid_from_calculate_final_item_stats(db_connections, insert_tea_pot_listing, insert_bed_lamp_listing_and_bids):
+    query_second_highest_bid = """
+        SELECT
+            item,
+            amount AS second_max_amount
+        FROM (
+            SELECT
+                item,
+                amount,
+                ROW_NUMBER() OVER (PARTITION BY item ORDER BY amount DESC) as bid_rank
+            FROM
+                bids
+            WHERE
+                item = %s
+        ) ranked_bids
+        WHERE
+            bid_rank = 2
+    """
+
+    with db_connections.cursor() as cur:
+        cur.execute(query_second_highest_bid, ("bed_lamp_1",))
+
+        result = cur.fetchone()
+
+    assert result is not None
+    assert result[0] == "bed_lamp_1"
+    assert result[1] == 7.00
+
+
+def test_bid_stats_from_calculate_final_item_stats(db_connections, insert_bed_lamp_listing_and_bids):
+    query_bid_stats = """
+        SELECT
+            item,
+            MIN(amount) as min_amount,
+            COUNT(id) as total_bid_count
+        FROM
+            bids
+        WHERE
+            item = %s
+        GROUP BY
+            item
+    """
+
+    with db_connections.cursor() as cur:
+        cur.execute(query_bid_stats, ("bed_lamp_1",))
+
+        result = cur.fetchone()
+
+    assert result is not None
+    assert result[0] == "bed_lamp_1"
+    assert result[1] == 6.00
+    assert result[2] == 3
+
+
+def test_bid_details_from_calculate_final_item_stats(db_connections, insert_bed_lamp_listing_and_bids):
+    query_bid_details = """
+        SELECT
+            b1.item,
+            b1.bidder as max_bidder,
+            b1.amount as max_amount
+        FROM
+            bids b1
+        JOIN (
+            SELECT 
+                item, 
+                MAX(amount) as max_amount
+            FROM 
+                bids
+            WHERE 
+                item = %s
+            GROUP BY 
+                item
+        ) max_bids ON b1.item = max_bids.item AND b1.amount = max_bids.max_amount
+        WHERE
+            b1.item = %s
+        ORDER BY
+            b1.bid_time ASC
+        LIMIT 1
+    """
+
+    with db_connections.cursor() as cur:
+        cur.execute("""
+            INSERT INTO bids (item, amount, bid_time, bidder)
+            VALUES ('bed_lamp_1', 7.20, 6, 13);
+        """)
+        db_connections.commit()
+        cur.execute(query_bid_details, ("bed_lamp_1","bed_lamp_1"))
+
+        result = cur.fetchone()
+
+    assert result is not None
+    assert result[0] == "bed_lamp_1"
+    assert result[1] == 10
+    assert result[2] == Decimal('7.20')
 
 
 def test_calculate_final_item_stats(monkeypatch, db_connections, suppress_initialize_tables, small_input):
