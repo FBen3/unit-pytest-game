@@ -115,7 +115,7 @@ def incorrect_auction_time():
 @pytest.fixture(scope="session")
 def tea_pot_bid_check():
     tea_pot_bids_path = os.path.join(
-        os.path.dirname(__file__), "fixtures", "bid_check_1.txt"
+        os.path.dirname(__file__), "fixtures", "tea_pot_bid_check.txt"
     )
 
     return tea_pot_bids_path
