@@ -14,3 +14,4 @@ config.ini
 my_test*.txt
 my_notes.txt
 my_plan.txt
+delete_this.py
