@@ -141,14 +141,14 @@ def test_bid_details_from_calculate_final_item_stats(db_connections, insert_bed_
         FROM
             bids b1
         JOIN (
-            SELECT 
-                item, 
+            SELECT
+                item,
                 MAX(amount) as max_amount
-            FROM 
+            FROM
                 bids
-            WHERE 
+            WHERE
                 item = %s
-            GROUP BY 
+            GROUP BY
                 item
         ) max_bids ON b1.item = max_bids.item AND b1.amount = max_bids.max_amount
         WHERE

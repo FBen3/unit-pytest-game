@@ -3,20 +3,6 @@ import pytest
 from integration.setup_test_db import *
 
 
-@pytest.fixture(scope="session")
-def connection_pool(prepare_test_database):
-    conn_pool = init_connection_pool()
-    yield conn_pool
-    conn_pool.closeall()
-
-
-@pytest.fixture(scope="session")
-def db_connections(connection_pool):
-    connection = connection_pool.getconn()
-    yield connection
-    connection_pool.putconn(connection)
-
-
 @pytest.fixture(scope="session", autouse=True)  # automatically apply to all tests
 def prepare_test_database():
     initialize_test_db()
@@ -26,6 +12,33 @@ def prepare_test_database():
 
 
 @pytest.fixture(scope="session")
+def connection_pool(prepare_test_database):
+    conn_pool = init_connection_pool()
+    yield conn_pool
+    conn_pool.closeall()
+
+
+# `function` scoping this fixture is crucial for ensuring that the connection gets
+# refreshed (each time it's requested), and each test function gets a fresh database
+# connection. This also mitigates the issues of one transactions interfering with another,
+# promoting test isolation.
+@pytest.fixture(scope="function")
+def db_connections(connection_pool):
+    connection = connection_pool.getconn()
+    yield connection
+    connection_pool.putconn(connection)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def reset_test_db(db_connections):
+    yield
+    db_connections.rollback()  # roll back aborted transactions
+    with db_connections.cursor() as cur:
+        cur.execute("TRUNCATE auction, bids CASCADE;")
+    db_connections.commit()
+
+
+@pytest.fixture(scope="function")
 def insert_tea_pot_listing(db_connections):
     with db_connections.cursor() as cur:
         cur.execute("DELETE FROM auction WHERE item = 'tea_pot_1'")  # delete any existing data related to this fixture
@@ -37,7 +50,7 @@ def insert_tea_pot_listing(db_connections):
     db_connections.commit()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def insert_tea_pot_bid(db_connections):
     with db_connections.cursor() as cur:
         cur.execute("DELETE FROM bids WHERE item = 'tea_pot_1'")
@@ -49,7 +62,7 @@ def insert_tea_pot_bid(db_connections):
     db_connections.commit()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def insert_bed_lamp_listing_and_bids(db_connections):
     with db_connections.cursor() as cur:
         cur.execute("DELETE FROM bids WHERE item = 'bed_lamp_1'")
@@ -67,6 +80,8 @@ def insert_bed_lamp_listing_and_bids(db_connections):
     db_connections.commit()
 
 
+# these fixtures, used for static files & configs, which do not change state between tests,
+# are ideal to be `session` scoped
 @pytest.fixture(scope="session")
 def default_auction():
     default_path = os.path.join(
