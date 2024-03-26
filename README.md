@@ -1,4 +1,3 @@
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) 
 ---
 
 ### THOUGHT MACHINE
@@ -14,18 +13,25 @@ Assumptions:
 - Testing framework: `Pytest`
 - Program expects a user supplied path to an input file
 - Optional `-s`,`--save` flag to persist database between runs
+- Program expects a Postgres database to be hosted
+- Program expects the user to place their own `config.ini` in project root, specifying DB credentials
 - Program can be run from anywhere [!!! make sure this is true !!!]
 
 Quickstart:
 
-- **Run**: 
-- **Run test suite**: 
-- **Run unit tests**: 
-- **Run a group of tests**:
+- **Run**: `python3 application/main.py path/to/auction_file.txt`
+- **Run & keep database state**: `python3 application/main.py -s path/to/auction_continued.txt`
+- **Run test suite**: `pytest`
+- **Run unit tests**: `pytest tests/unit/*`
+- **Run integration tests**: `pytest tests/integration/*`
+- **Run end-to-end tests**: `pytest tests/end-to-end/*`
+- A
 
-Observations:
+Follow-up:
 
-- # buggy line in auction | incorrect content [comment on this]
-- read multiple files and have multiple auctions going
+- Potential augmentation:
+  1. A
+- Non-exhaustive un-addressed edge cases:
+  1. A
 
 
