@@ -1,44 +1,9 @@
 import pytest
 
-from application.auction import *
-from application.db_procedures import (
-    process_listing,
-    process_bidding,
-    bid_check,
-    check_no_bids
-)
+from application.auction import Auction
 
 
-def test_auction_edge_cases_1_2_3_5_7(capsys, monkeypatch, db_connections, suppress_initialize_tables, small_input):
-    monkeypatch.setattr(
-        'application.auction.process_listing',
-        lambda *x: process_listing(*x, db_connections)
-    )
-    monkeypatch.setattr(
-        'application.auction.process_bidding',
-        lambda *x: process_bidding(*x, db_connections)
-    )
-    monkeypatch.setattr(
-        'application.db_procedures.bid_check',
-        lambda *x: bid_check(*x, db_connections)
-    )
-    monkeypatch.setattr(
-        'application.db_procedures.check_no_bids',
-        lambda x: check_no_bids(x, db_connections)
-    )
-    monkeypatch.setattr(
-        'application.auction.all_unexpired_items',
-        lambda x: all_unexpired_items(x, db_connections)
-    )
-    monkeypatch.setattr(
-        'application.auction.calculate_final_item_stats',
-        lambda x: calculate_final_item_stats(x, db_connections)
-    )
-    monkeypatch.setattr(
-        'application.auction.update_status',
-        lambda x: update_status(x, db_connections)
-    )
-
+def test_auction_edge_cases_1_2_3_5_7(capsys, db_connections, suppress_initialize_tables, mock_full_db_operations, small_input):
     auction = Auction(save_option=False)
     auction.run(small_input)
     auction.report()

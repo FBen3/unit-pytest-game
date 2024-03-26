@@ -1,6 +1,17 @@
+from unittest.mock import Mock
+
 import pytest
 
 from integration.setup_test_db import *
+from application.db_procedures import (
+    process_listing,
+    process_bidding,
+    bid_check,
+    check_no_bids,
+    all_unexpired_items,
+    calculate_final_item_stats,
+    update_status
+)
 
 
 @pytest.fixture(scope="session", autouse=True)  # automatically apply to all tests
@@ -173,3 +184,43 @@ def suppress_initialize_tables(monkeypatch):
         'application.auction.initialize_tables',
         lambda x: None
     )
+
+
+@pytest.fixture
+def mock_full_db_operations(monkeypatch, db_connections):
+    mock_process_listing = Mock(side_effect=lambda *x: process_listing(*x, db_connections))
+    mock_process_bidding = Mock(side_effect=lambda *x: process_bidding(*x, db_connections))
+    mock_bid_check = Mock(side_effect=lambda *x: bid_check(*x, db_connections))
+    mock_check_no_bids = Mock(side_effect=lambda x: check_no_bids(x, db_connections))
+    mock_all_unexpired_items = Mock(side_effect=lambda x: all_unexpired_items(x, db_connections))
+    mock_calculate_final_item_stats = Mock(side_effect=lambda x: calculate_final_item_stats(x, db_connections))
+    mock_update_status = Mock(side_effect=lambda x: update_status(x, db_connections))
+
+    monkeypatch.setattr('application.auction.process_listing', mock_process_listing)
+    monkeypatch.setattr('application.auction.process_bidding', mock_process_bidding)
+    monkeypatch.setattr('application.db_procedures.bid_check', mock_bid_check)
+    monkeypatch.setattr('application.db_procedures.check_no_bids', mock_check_no_bids)
+    monkeypatch.setattr( 'application.auction.all_unexpired_items', mock_all_unexpired_items)
+    monkeypatch.setattr('application.auction.calculate_final_item_stats', mock_calculate_final_item_stats)
+    monkeypatch.setattr('application.auction.update_status', mock_update_status)
+
+    # optional return
+    # By returning the mocks, you allow other/future tests that use this fixture to customize the behavior of these mock
+    # objects further for different test scenarios; (e.g. if a different test needs to override side_effect,
+    # or wants to specify a return_value)
+    # Returning the mocks make them accessible within the test; (so you can use methods like mock.assert_called_with()
+    # or check mock.call_count if needed).
+    # In summary, different tests might need to interact with these mocks differently. By having access to the mock
+    # objects directly, future tests can adjust the mocks to fit their specific requirements without affecting other
+    # tests; (leading to more flexible and maintainable testing; this ability to override allows for greater flexibility
+    # and customization for different test scenarios).
+    # It also makes the fixture more reusable. Each test can customize the mock behavior as needed, overriding the default.
+    return {
+        "process_listing": mock_process_listing,
+        "process_bidding": mock_process_bidding,
+        "bid_check": mock_bid_check,
+        "check_no_bids": mock_check_no_bids,
+        "all_unexpired_items": mock_all_unexpired_items,
+        "calculate_final_item_stats": mock_calculate_final_item_stats,
+        "update_status": mock_update_status
+    }
