@@ -2,7 +2,12 @@
 
 .PHONY: all unit integration end2end
 
-all: unit integration end2end
+all: install
+
+install:
+		pip install -r requirements.txt
+
+test: unit integration end2end
 
 unit:
 		pytest tests/unit/* -v
