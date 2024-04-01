@@ -10,6 +10,9 @@ __pycache__/
 # Database
 config.ini
 
+# Unit test / coverage reports
+.coverage
+
 # personal
 my_test*.txt
 my_notes.txt
