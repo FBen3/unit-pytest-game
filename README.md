@@ -29,9 +29,24 @@ Quickstart:
 
 Follow-up:
 
+- A
 - Potential augmentation:
   1. A
 - Non-exhaustive un-addressed edge cases:
   1. A
+
+
+
+
+coverage report [put in somewhere nicely]
+```
+Name                           Stmts   Miss  Cover
+--------------------------------------------------
+application/auction.py            58      7    88%
+application/config.py             12      1    92%
+application/db_procedures.py      92     13    86%
+--------------------------------------------------
+TOTAL                            162     21    87%
+```
 
 
