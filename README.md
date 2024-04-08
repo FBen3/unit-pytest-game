@@ -43,8 +43,8 @@ Follow-up:
 - <details> 
   <summary>Untested code:</summary>
   <ul>
-    <li>`config.py`</li>
-    <li>`check_no_bids()`</li>
+    <li><code>config.py</code></li>
+    <li><code>check_no_bids()</code></li>
   </ul>
   </details>
 - <details>
