@@ -1,16 +1,17 @@
 > This repo takes a programing exercises and over-engineers it for learning purposes;
 > implementing it multiple times with slight variations and testing frameworks.
-> branch: 
->   [main]              exercise outline
->   [game]              initial functional implementation
->   [game-pytest]       tested using Pytest
->   [game-unittest]     tested using Unittest
->   [game-class]        object-oriented implementation
->   [game-postgresql]   implemented with Postgres backend 
+> 
+> branch:
+> - [main] : exercise outline  
+> - [game] : initial functional implementation  
+> - [game-pytest] : tested using Pytest
+> - [game-unittest] : tested using Unittest  
+> - [game-class] : object-oriented implementation  
+> - [game-postgresql] : implemented with Postgres backend  
 
-===========================================
-Programming Exercise - Auction House
-===========================================
+
+## Programming Exercise - Auction House
+
 
 Requirements:
  - Please complete the following programming exercise. Allow for about 4-6 hours.
@@ -24,7 +25,7 @@ Requirements:
  - Provide a brief README file with instructions on how to build/run your program (and tests if
    present) - and any assumptions made
 
-===========================================
+-------------------------------------------
 
 Consider you are running an auction website in which people can put items up for sale, and others
 can bid to buy them. At the end of each auction if there are bids meeting or in excess of the
@@ -39,26 +40,26 @@ At the end of the auction the winner will pay the price of the second highest bi
 is only a single valid bid they will pay the reserve price of the auction. If two bids are received
 for the same amount then the earliest bid wins the item.
 
-===========================================
+-------------------------------------------
 
-** EXERCISE **
+### EXERCISE
 
 Given an input file containing instructions to both start auctions, and place bids. You must
 execute all instructions, and output for each item (upon the auction closing) the winning bid,
 the final price to be paid, and the user who has won the item as well as some basic stats about
 the auction. You will be provided a basic sample input file to help you test your program.
 
-Input:
+**Input:**
 
 You will receive a pipe-delimited input file representing the started auctions, and bids. The
 first entry on each line of this file will be a timestamp, the file will be strictly in-order
 of timestamp. There are three types of rows found in this file:
 
-1) Users listing items for sale.
+1. Users listing items for sale.
 
 This appears in the format:
 
-timestamp|user_id|action|item|reserve_price|close_time
+`timestamp|user_id|action|item|reserve_price|close_time`  
 
 `timestamp` will be an integer representing a unix epoch time and is the auction start time,
 `user_id` is an integer user id
@@ -67,11 +68,11 @@ timestamp|user_id|action|item|reserve_price|close_time
 `reserve_price` is a decimal representing the item reserve price in the site's local currency.
 `close_time` will be an integer representing a unix epoch time
 
-2) Bids on items
+2. Bids on items
 
 This will appear in the format:
 
-timestamp|user_id|action|item|bid_amount
+`timestamp|user_id|action|item|bid_amount`  
 
 `timestamp` will be an integer representing a unix epoch time and is the time of the bid,
 `user_id` is an integer user id
@@ -79,23 +80,21 @@ timestamp|user_id|action|item|bid_amount
 `item` is a unique string code for that item.
 `bid_amount` is a decimal representing a bid in the auction site's local currency.
 
-3) Heartbeat messages
+3. Heartbeat messages
 
 These messages may appear periodically in the input to ensure that auctions can be closed
 in the absence of bids, they take the format:
 
-timestamp
-
 `timestamp` will be an integer representing a unix epoch time.
 
 
-Expected Output:
+**Output:**
 
 The program should produce the following expected output, with each line representing the
 outcome of a completed auction. This should be written to stdout and be pipe delimited
 with the following format:
 
-close_time|item|user_id|status|price_paid|total_bid_count|highest_bid|lowest_bid
+`close_time|item|user_id|status|price_paid|total_bid_count|highest_bid|lowest_bid`  
 
 `close_time` should be a unix epoch of the time the auction finished
 `item` is the unique string item code.
@@ -107,10 +106,10 @@ close_time|item|user_id|status|price_paid|total_bid_count|highest_bid|lowest_bid
 `lowest_bid` the lowest bid placed on the item as a number to two decimal places
 
 
-Example:
+### Example
 
-Input:
-
+**Input:**
+```
 10|1|SELL|toaster_1|10.00|20
 12|8|BID|toaster_1|7.50
 13|5|BID|toaster_1|12.50
@@ -121,8 +120,8 @@ Input:
 19|3|BID|tv_1|200.00
 20
 21|3|BID|tv_1|300.00
+```
+**Output:**
 
-Output:
-
-20|toaster_1|8|SOLD|12.50|3|20.00|7.50
-20|tv_1||UNSOLD|0.00|2|200.00|150.00
+`20|toaster_1|8|SOLD|12.50|3|20.00|7.50`  
+`20|tv_1||UNSOLD|0.00|2|200.00|150.00`  
