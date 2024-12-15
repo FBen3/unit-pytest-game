@@ -1,10 +1,5 @@
----
+## Programming Exercise - Auction House
 
-### THOUGHT MACHINE
-
-#### Programming Test - Auction House
-
----
 
 Notes:
 
