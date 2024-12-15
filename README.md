@@ -1,6 +1,15 @@
+> This repo takes a programing exercises and over-engineers it for learning purposes;
+> implementing it multiple times with slight variations and testing frameworks.
+> branch: 
+>   [main]              exercise outline
+>   [game]              initial functional implementation
+>   [game-pytest]       tested using Pytest
+>   [game-unittest]     tested using Unittest
+>   [game-class]        object-oriented implementation
+>   [game-postgresql]   implemented with Postgres backend 
+
 ===========================================
-THOUGHT MACHINE
-Programming Test - Auction House
+Programming Exercise - Auction House
 ===========================================
 
 Requirements:
@@ -92,10 +101,9 @@ close_time|item|user_id|status|price_paid|total_bid_count|highest_bid|lowest_bid
 `item` is the unique string item code.
 `user_id` is the integer id of the winning user, or blank if the item did not sell.
 `status` should contain either "SOLD" or "UNSOLD" depending on the auction outcome.
-`price_paid` should be the price paid by the auction winner (0.00 if the item is UNSOLD), as a
-number to two decimal places
+`price_paid` should be the price paid by the auction winner (0.00 if the item is UNSOLD), as a number to two decimal places
 `total_bid_count` should be the number of valid bids received for the item.
-'highest_bid' the highest bid received for the item as a number to two decimal places
+`highest_bid` the highest bid received for the item as a number to two decimal places 
 `lowest_bid` the lowest bid placed on the item as a number to two decimal places
 
 
@@ -113,7 +121,6 @@ Input:
 19|3|BID|tv_1|200.00
 20
 21|3|BID|tv_1|300.00
-
 
 Output:
 
